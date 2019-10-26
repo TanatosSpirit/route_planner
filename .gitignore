@@ -2,3 +2,5 @@
 .idea/
 
 .ipynb_checkpoints/
+
+libs/__pycache__/

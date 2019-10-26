@@ -3,6 +3,12 @@ import sys
 sys.path.append("libs/ford-bellman")
 from ford_bellman import Graph
 
+class global_route_planner:
+
+    def load_map(self, route_map):
+        self.map = route_map
+
+
 #  Представляем карту в виде графа
 g = Graph(8) # number of vertices
 
@@ -24,9 +30,9 @@ g.addEdge(7, 5, 38.7)
 predecessor_array = g.BellmanFord(2)
 print(predecessor_array)
 
-# Затем восстанавливем путь по графу от узла 0 до 6. #Прежде чем получить путь, нужно убедиться в его доступности
+# Затем восстанавливем путь по графу от узла 0 до 6. TODO Прежде чем получить путь, нужно убедиться в его доступности
 
-def get_path(src, dist, predecessor_array):
+def get_path(dist, predecessor_array):
     path = []
     reached = False
 
@@ -42,7 +48,7 @@ def get_path(src, dist, predecessor_array):
     return path
 
 
-print("Path: ", get_path(2, 5, predecessor_array))
+print("Path: ", get_path(5, predecessor_array))
 
 
 
