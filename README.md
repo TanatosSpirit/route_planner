@@ -1,4 +1,4 @@
-global-path-planning
+Route-planner
 
 Карта для тестирования поиска маршрута
 ===

@@ -1,9 +1,7 @@
-# добавление директории для подключения модуля, иначе ругается на дефис
-import sys
-sys.path.append("libs/ford-bellman")
+# в настроках проекта в PyCharm узал папку lib/ford-bellman как source
 from ford_bellman import Graph
 
-class global_route_planner:
+class route_planner:
 
     def load_map(self, route_map):
         self.map = route_map

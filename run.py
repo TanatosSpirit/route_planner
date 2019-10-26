@@ -1,4 +1,4 @@
-from libs.global_path_planner import global_route_planner
+from libs.route_planner import route_planner
 
 test_map = [[0, 1, 5],
             [1, 2, 2],
@@ -11,6 +11,6 @@ test_map = [[0, 1, 5],
             [5, 6, 5],
             [7, 5, 38.7]]
 
-grp = global_route_planner()
+rp = route_planner()
 
-grp.load_map(test_map)
+rp.load_map(test_map)
