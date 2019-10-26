@@ -20,6 +20,7 @@ class route_planner:
             self.g.addEdge(u, v, w)
 
     def load_map(self, route_map):
+        #TODO Здесь нет проверки вменяемости карты
         self.map = route_map
         self.create_map()
 
