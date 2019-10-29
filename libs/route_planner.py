@@ -87,25 +87,37 @@ class route_planner:
         else:
 
             # сбрасываю старую карту и загружаю обратную карту
+            #TODO количество вершин НЕ обновляется!
             self.g.reset_map()
             self.create_map(self.r_map)
 
             pred_and_distance_array = self.g.BellmanFord(self.current_pose)
 
+            src_pred = []
+            for i in range(len(pred_and_distance_array[0])):
+                if pred_and_distance_array[0][i] != -1:
+                    src_pred.append(i)
+
+
             pred_and_distance_target = self.g.BellmanFord(self.destination_pose)
 
-            #TODO проверить правильность нахождения наибыстрейшего пути
+            target_pred = []
+            for i in range(len(pred_and_distance_target[0])):
+                if pred_and_distance_target[0][i] != -1:
+                    target_pred.append(i)
 
-            #TODO проверить правильность нахождения общих элементов, а то списки содержат предшествеников
-            common_elements = list(self.find_common_elements([pred_and_distance_array[0], pred_and_distance_target[0]]))
+
+            common_elements = list(self.find_common_elements([src_pred, target_pred]))
+            print(common_elements)
 
             node_number = -1
             weight = float("Inf")
             for item in common_elements:
                 if item != -1:  # в общем списке содержится -1
 
-                    local_weight = self.reverse_velocity * pred_and_distance_array[1][item] + self.direct_velocity * \
-                    pred_and_distance_target[1][item]
+                    reverse_weight = pred_and_distance_array[1][item] / self.reverse_velocity
+                    direct_weith = pred_and_distance_target[1][item] / self.direct_velocity
+                    local_weight = reverse_weight + direct_weith
                     if (local_weight) < weight:
                         node_number = item
                         weight = local_weight
