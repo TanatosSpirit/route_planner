@@ -1,5 +1,5 @@
-# в настроках проекта в PyCharm узал папку lib/ford-bellman как source
-from ford_bellman import Graph
+# в настроках проекта в PyCharm юзал папку lib/bellman-ford как source
+from bellman_ford import Graph
 
 class route_planner:
 
