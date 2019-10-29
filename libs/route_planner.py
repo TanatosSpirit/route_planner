@@ -8,7 +8,7 @@ class route_planner:
                      'node' : 0}
         self.r_map = {'vertex': [],
                     'node': 0}
-        self.g = 0
+        self.g = 0  #TODO переделать класс Graph, чтобы можно было создать объект
         self.current_pose = -1
         self.destination_pose = -1
         self.direct_velocity = 40 / 3.6  # тактов/лапоть
