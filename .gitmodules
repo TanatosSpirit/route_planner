@@ -1,3 +1,0 @@
-[submodule "libs/ford-bellman"]
-	path = libs/bellman-ford
-	url = https://github.com/TanatosSpirit/bellman-ford
