@@ -32,4 +32,3 @@ rp.set_destination_point(destination_pose)
 
 # Получаем вывод о доступности точки назначения и маршрут до нее
 route = rp.get_path()
-print(route)
