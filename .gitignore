@@ -4,3 +4,5 @@
 .ipynb_checkpoints/
 
 libs/__pycache__/
+
+libs/map_objects/__pycache__/
