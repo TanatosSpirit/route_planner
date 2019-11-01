@@ -1,8 +1,9 @@
 from map_object import MapObject
 
+
 class Node(MapObject):
-    def __init__(self, name, object_id, xyz):
-        MapObject.__init__(name, object_id)
+    def __init__(self, name, vm_id, object_id, xyz):
+        MapObject.__init__(name, vm_id, object_id)
         self.xyz = xyz
         self.in_lane_id_array = []
         self.out_lane_id_array = []

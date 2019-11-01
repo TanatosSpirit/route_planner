@@ -1,7 +1,11 @@
-class vm_loader:
+from lane import Lane
+
+
+class VMLoader:
 
     def __init__(self):
         self.lane_array = []
+        self.lane_obj_array = []
         self.node_array = []
         self.laneID = 0
         self.nodeID = 0
@@ -16,41 +20,47 @@ class vm_loader:
         while line:
             if x[1] == "LANE":
                 lane = []
+                lane_obj = Lane()
 
                 #NAME#Lane[13]
                 line = file_object.readline()
                 line = line.lstrip("#")
                 line = line.strip("\n")
-                x = line.split("#")
-                lane.append(x[1])
+                name = line.split("#")
+                lane.append(name[1])
+                lane_obj.add_name(name[1])
 
                 #ID#13
                 line = file_object.readline()
                 line = line.lstrip("#")
                 line = line.strip("\n")
-                x = line.split("#")
-                lane.append(int(x[1]))
+                vm_obj = line.split("#")
+                lane.append(int(vm_obj[1]))
+                lane_obj.add_vm_id(int(vm_obj[1]))
 
                 #self.laneID
                 lane.append(self.laneID)
+                lane_obj.add_obj_id(self.laneID)
                 self.laneID += 1
 
                 #SPEED#5
                 line = file_object.readline()
                 line = line.lstrip("#")
                 line = line.strip("\n")
-                x = line.split("#")
-                lane.append(int(x[1]))
+                speed = line.split("#")
+                lane.append(int(speed[1]))
+                lane_obj.add_speed(int(speed[1]))
 
                 #NUMBER_OF_POINTS#108
                 line = file_object.readline()
                 line = line.lstrip("#")
                 line = line.strip("\n")
-                points_number = int(line.split("#")[1])
-                lane.append(points_number)
+                num_of_points = int(line.split("#")[1])
+                lane.append(num_of_points)
+                lane_obj.add_num_of_points(num_of_points)
 
                 lane_wps = []
-                for i in range(points_number):
+                for i in range(num_of_points):
                     line = file_object.readline()
                     line = line.strip("\n")
                     line = line.split(",")
@@ -58,10 +68,12 @@ class vm_loader:
                     y = float(line[1])
                     z = float(line[2])
                     lane_wps.append([x, y, z])
+                    lane_obj.add_wp([x, y, z])
 
 
                 lane.append(lane_wps)
                 self.lane_array.append(lane)
+                self.lane_obj_array.append(lane_obj)
 
                 line = file_object.readline()
 
@@ -168,7 +180,7 @@ class vm_loader:
 
 
 if __name__ == '__main__':
-    filepath = 'D:\\workspace\\python\\route-planner\\data\\MiniPolygonGraph.namivm'
-    vml = vm_loader()
+    filepath = '..\\data\\MiniPolygonGraph.namivm'
+    vml = VMLoader()
     data = vml.read_file(filepath)
-    # print(data)
+    print(data)
