@@ -82,7 +82,7 @@ class route_planner:
                     reached = True
 
             path.reverse()
-
+            return path
             state = 'Direct route is found'
         else:
 
