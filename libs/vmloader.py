@@ -15,6 +15,7 @@ class VMLoader:
         self.node_obj_array = []
         self.laneID = 0
         self.nodeID = 0
+        self.graph = []
 
     def read_file_v01(self, file_object):
         line = file_object.readline()
@@ -116,7 +117,9 @@ class VMLoader:
                 input_lane_id = line.split(",")
 
                 for id in input_lane_id:
-                    node_obj.add_input_lane_id(id)
+                    for lane in self.lane_obj_array:
+                        if lane.vm_id == int(id):
+                            node_obj.add_input_lane_id(lane.obj_id)
 
                 # OUTPUT_LANE_ID
                 line = file_object.readline()
@@ -125,7 +128,10 @@ class VMLoader:
                 output_lane_id = line.split(",")
 
                 for id in output_lane_id:
-                    node_obj.add_output_lane_id(id)
+                    for lane in self.lane_obj_array:
+                        if lane.vm_id == int(id):
+                            node_obj.add_output_lane_id(lane.obj_id)
+
 
                 self.node_obj_array.append(node_obj)
 
@@ -141,8 +147,26 @@ class VMLoader:
                 print("The format is not supported")
                 break
 
+        self.create_map()
+
+
     def create_map(self):
-        pass
+
+        exit_flag = False
+        for u_node in self.node_obj_array:
+            for output_lane in u_node.out_lane_id_array:
+                for v_node in self.node_obj_array:
+                    for input_lane in v_node.in_lane_id_array:
+
+                        if output_lane == input_lane:
+                            edge = [u_node.obj_id, v_node.obj_id, self.lane_obj_array[output_lane].length]
+                            self.graph.append(edge)
+                            exit_flag = True
+                            break
+
+                    if (exit_flag):
+                        exit_flag = False
+                        break
 
 
     def read_file(self, filepath):
@@ -168,8 +192,8 @@ class VMLoader:
             if float(x[4]) == 0.1:
                 self.read_file_v01(file_object)
 
-        return [self.lane_obj_array, self.node_obj_array]
-
+        # return [self.lane_obj_array, self.node_obj_array]
+        return self.graph
 
 if __name__ == '__main__':
     filepath = '..\\data\\MiniPolygonGraph.namivm'
