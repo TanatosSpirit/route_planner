@@ -6,3 +6,5 @@
 libs/__pycache__/
 
 libs/map_objects/__pycache__/
+
+*.pyc

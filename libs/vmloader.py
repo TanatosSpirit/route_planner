@@ -1,11 +1,18 @@
 from lane import Lane
+from node import Node
 
 
 class VMLoader:
+    """
+            Загружает файл с векторной картой и формирует структуры с которыми работает планировщик
+
+
+
+    """
 
     def __init__(self):
         self.lane_obj_array = []
-        self.node_array = []
+        self.node_obj_array = []
         self.laneID = 0
         self.nodeID = 0
 
@@ -52,7 +59,6 @@ class VMLoader:
                 num_of_points = int(line.split("#")[1])
                 lane_obj.add_num_of_points(num_of_points)
 
-                lane_wps = []
                 for i in range(num_of_points):
                     line = file_object.readline()
                     line = line.strip("\n")
@@ -60,7 +66,6 @@ class VMLoader:
                     x = float(line[0])
                     y = float(line[1])
                     z = float(line[2])
-                    lane_wps.append([x, y, z])
                     lane_obj.add_wp([x, y, z])
 
                 self.lane_obj_array.append(lane_obj)
@@ -74,24 +79,24 @@ class VMLoader:
 
 
             elif x[1] == "NODE":
-                node = []
+                node_obj = Node()
 
                 #NAME#Node[21]
                 line = file_object.readline()
                 line = line.lstrip("#")
                 line = line.strip("\n")
                 x = line.split("#")
-                node.append(x[1])
+                node_obj.add_name(x[1])
 
                 #ID#21
                 line = file_object.readline()
                 line = line.lstrip("#")
                 line = line.strip("\n")
                 x = line.split("#")
-                node.append(int(x[1]))
+                node_obj.add_vm_id(int(x[1]))
 
                 #self.nodeID
-                node.append(self.nodeID)
+                node_obj.add_obj_id(self.nodeID)
                 self.nodeID += 1
 
                 #XYZ
@@ -102,7 +107,7 @@ class VMLoader:
                 x = float(line[0])
                 y = float(line[1])
                 z = float(line[2])
-                node.append([x, y, z])
+                node_obj.add_coordinates([x, y, z])
 
                 #INPUT_LANE_ID
                 line = file_object.readline()
@@ -110,12 +115,8 @@ class VMLoader:
                 line = line.strip("\n")
                 input_lane_id = line.split(",")
 
-                in_lane_id_array = []
                 for id in input_lane_id:
-                    in_lane_id_array.append(id)
-
-                node.append(in_lane_id_array)
-                self.node_array.append(node)
+                    node_obj.add_input_lane_id(id)
 
                 # OUTPUT_LANE_ID
                 line = file_object.readline()
@@ -123,12 +124,10 @@ class VMLoader:
                 line = line.strip("\n")
                 output_lane_id = line.split(",")
 
-                out_lane_id_array = []
                 for id in output_lane_id:
-                    out_lane_id_array.append(id)
+                    node_obj.add_output_lane_id(id)
 
-                node.append(out_lane_id_array)
-                self.node_array.append(node)
+                self.node_obj_array.append(node_obj)
 
 
 
@@ -141,6 +140,9 @@ class VMLoader:
             else:
                 print("The format is not supported")
                 break
+
+    def create_map(self):
+        pass
 
 
     def read_file(self, filepath):
@@ -165,7 +167,8 @@ class VMLoader:
             x = line.split("#")
             if float(x[4]) == 0.1:
                 self.read_file_v01(file_object)
-                print(self.node_array)
+
+        return [self.lane_obj_array, self.node_obj_array]
 
 
 if __name__ == '__main__':
