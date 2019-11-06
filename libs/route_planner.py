@@ -1,5 +1,7 @@
 # в настроках проекта в PyCharm юзал папку lib/bellman-ford как source
-from bellman_ford import Graph
+# from bellman_ford import Graph
+from bellman_ford_extended import Graph
+import copy
 
 class route_planner:
 
@@ -8,7 +10,7 @@ class route_planner:
                      'node' : 0}
         self.r_map = {'vertex': [],
                     'node': 0}
-        self.g = 0  #TODO переделать класс Graph, чтобы можно было создать объект
+        self.g = Graph()
         self.current_pose = -1
         self.destination_pose = -1
         self.direct_velocity = 40 / 3.6  # тактов/лапоть
@@ -16,15 +18,18 @@ class route_planner:
 
     def create_map(self, map):
         #  Представляем карту в виде графа
-        self.g = Graph(map['node'])
+        self.g.set_num_vertices(map['node'])
         for i in range(len(map['vertex'])):
             u = map['vertex'][i][0]
             v = map['vertex'][i][1]
             w = map['vertex'][i][2]
-            self.g.addEdge(u, v, w)
+            a = map['vertex'][i][3]
+            self.g.addEdge(u, v, w, a)
 
     def create_reverse_map(self):
-        self.r_map = self.map.copy()
+        # TODO может лучше сделать флаг "Назад" для обработки алгоритмом поиска назад? Вместо копированиея карты
+        self.r_map['vertex'] = copy.deepcopy(self.map['vertex'])
+        self.r_map['node'] = self.map['node']
 
         for i in range(len(self.r_map['vertex'])):
             self.r_map['vertex'][i][0], self.r_map['vertex'][i][1] \
@@ -33,7 +38,8 @@ class route_planner:
 
     def load_map(self, route_map):
         # TODO Здесь нет проверки вменяемости карты
-        self.map = route_map
+        self.map['vertex'] = copy.deepcopy(route_map['vertex'])
+        self.map['node'] = route_map['node']
         self.create_map(self.map)
         self.create_reverse_map()
 
@@ -71,6 +77,7 @@ class route_planner:
         if pred_and_distance_array[0][self.destination_pose] != -1:
 
             # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
+            # TODO восстановление пути можно сделать проще или вынести в отдельный метод
             reached = False
 
             current = self.destination_pose
@@ -84,11 +91,11 @@ class route_planner:
             path.reverse()
             state = 'Direct route is found'
 
-            return path
+            output = [state, path]
+            return output
         else:
 
             # сбрасываю старую карту и загружаю обратную карту
-            #TODO количество вершин НЕ обновляется!
             self.g.reset_map()
             self.create_map(self.r_map)
 
@@ -99,7 +106,6 @@ class route_planner:
                 if pred_and_distance_array[0][i] != -1:
                     src_pred.append(i)
 
-
             pred_and_distance_target = self.g.BellmanFord(self.destination_pose)
 
             target_pred = []
@@ -109,7 +115,6 @@ class route_planner:
 
 
             common_elements = list(self.find_common_elements([src_pred, target_pred]))
-            print(common_elements)
 
             node_number = -1
             weight = float("Inf")
@@ -123,86 +128,45 @@ class route_planner:
                         node_number = item
                         weight = local_weight
 
-            print(node_number)
+
+            # TODO найти машрут от общей точки до src и dist
+
+            self.g.reset_map()
+            self.create_map(self.map)
+
+            pred_and_distance_array = self.g.BellmanFord(node_number)
+
+            # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
+            # TODO восстановление пути можно сделать проще или вынести в отдельный метод
+            reached = False
+            path_backward = []
+            current = self.current_pose
+            while not reached:
+                path_backward.append(current)
+                current = pred_and_distance_array[0][current]
+
+                if current == -1:
+                    reached = True
+
+
+            # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
+            # TODO восстановление пути можно сделать проще или вынести в отдельный метод
+            reached = False
+
+            current = self.destination_pose
+            while not reached:
+                path.append(current)
+                current = pred_and_distance_array[0][current]
+
+                if current == -1:
+                    reached = True
 
 
 
-        #     predecessor = []
-        #     reverse_path = []
-        #
-        #     pred = self.find_predecessors(self.current_pose)
-        #     predecessor.extend(pred)
-        #
-        #     reverse_path.append(self.current_pose)
-        #     for node in predecessor:
-        #
-        #         predecessor_array = self.g.BellmanFord(self.destination_pose)
-        #
-        #         # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
-        #         reached = False
-        #
-        #         current = self.current_pose
-        #         while not reached:
-        #             path.append(current)
-        #             current = predecessor_array[current]
-        #
-        #             if current == -1:
-        #                 reached = True
-        #
-        #         path.reverse()
-        #         state = 'Direct route is not found'
-        #
-        #
-        # output = [state, path]
-        # return output
+            path.reverse()
 
 
+            state = 'Direct route is not found'
 
-
-
-# current_node = 2
-# target_node = 0
-#
-# g = Graph(4)
-# g.addEdge(0, 1, 8)
-# g.addEdge(1, 2, 5)
-# g.addEdge(2, 3, 8)
-# g.addEdge(2, 0, 15)
-# g.addEdge(3, 0, 5)
-#
-# searche = g.BellmanFord(current_node)
-#
-# achieved = False
-# path = []
-# path.append(target_node)
-# next_node = target_node
-# while not achieved:
-#     path.append(searche[next_node])
-#     next_node = searche[next_node]
-#     if next_node == current_node:
-#         achieved = True
-#
-# print(path)
-# path = [0, 4, 3, 2]
-#
-#
-# g = Graph(5)
-# g.addEdge(0, 1, 8)
-# g.addEdge(1, 2, 5)
-# g.addEdge(2, 3, 8)
-# g.addEdge(2, 0, 15)
-# g.addEdge(3, 4, 2)
-#
-# new_current_node = 4
-# pose = 1
-#
-# achievable = False
-# while not achievable:
-#     new_searche = g.BellmanFord(new_current_node)
-#     if new_searche[target_node] == -1:
-#         pose += 1
-#         new_current_node = path[pose]
-#     else:
-#         achievable = True
-#
-# print(new_searche)
+            output = [state, path_backward, path]
+            return output

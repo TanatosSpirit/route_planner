@@ -1,20 +1,5 @@
 from libs.route_planner import route_planner
-
-test_map = {'vertex': [
-            [0, 1, 5.],
-            [1, 2, 2.],
-            [2, 3, 7.14],
-            [2, 5, 39.6],
-            [3, 4, 2.],
-            [1, 2, 2.],
-            # [4, 5, 10.14],
-            [4, 7, 18.],
-            [4, 8, 6.14],
-            [5, 6, 5.],
-            [7, 5, 38.7] #,
-            # [8, 5, 4]
-                       ],
-            'node': 9}
+from test_map import test_map
 
 # создаем планировщик (запустили ROS-ноду)
 rp = route_planner()
