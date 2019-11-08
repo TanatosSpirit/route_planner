@@ -75,6 +75,7 @@ class route_planner:
         pred_and_distance_array = self.g.BellmanFord(self.current_pose)
 
         path = []
+        wps = []
         # Прежде чем вернуть путь до точки назначение, нужно убедиться в ее доступности.
         if pred_and_distance_array[0][self.destination_pose] != -1:
 
@@ -93,7 +94,12 @@ class route_planner:
             path.reverse()
             state = 'Direct route is found'
 
-            output = [state, path]
+            for lane in self.map['lane']:
+                for i in range(len(path)-1):
+                    if lane.identification[0] == path[i] and lane.identification[1] == path[i+1]:
+                        wps.extend(lane.wp_array)
+
+            output = [state, path, wps]
             return output
         else:
 

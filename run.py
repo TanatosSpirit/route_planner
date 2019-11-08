@@ -20,7 +20,6 @@ vm_map = vml.read_file(filepath)
 viz.new_fig()
 viz.take_map(vm_map)
 
-
 # передали карту планировщику (прослушали топик с векторной картой)
 if test == True:
     rp.load_map(test_map)

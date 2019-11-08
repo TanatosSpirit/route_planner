@@ -22,6 +22,10 @@ class Visualizer:
         self.y_node_route = []
         self.z_node_route = []
 
+        self.x_route = []
+        self.y_route = []
+        self.z_route = []
+
     def show(self):
         plt.show()
 
@@ -67,6 +71,16 @@ class Visualizer:
             self.z_node.remove(self.z_node[i])
 
         self.figs[-1][1].scatter(self.x_node_route, self.y_node_route, s=50, color='red')
+
+        x = [i[0] for i in route[2]]
+        y = [j[1] for j in route[2]]
+        z = [k[2] for k in route[2]]
+
+        self.x_route.extend(x)
+        self.y_route.extend(y)
+        self.z_route.extend(z)
+
+        self.figs[-1][1].scatter(self.x_route, self.y_route, s=10, color='red')
 
 
 if __name__ == '__main__':
