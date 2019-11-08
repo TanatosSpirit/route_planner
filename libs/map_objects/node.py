@@ -15,4 +15,4 @@ class Node(MapObject):
         self.out_lane_id_array.append(out_id)
 
     def add_coordinates(self, xyz):
-        self.xyz.append(xyz)
+        self.xyz = xyz.copy()

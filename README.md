@@ -4,6 +4,9 @@ Route-planner
 ===
 ![some_text](images/map_1.jpg)
 
+Упрощенная карта площадки НАМИ
+===
+![some_text](images/map_2.jpg)
 
 ![some_text](images/scenario_3.png)
 

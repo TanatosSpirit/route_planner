@@ -6,40 +6,42 @@ import copy
 class route_planner:
 
     def __init__(self):
-        self.map = {'vertex': [],
-                     'node' : 0}
-        self.r_map = {'vertex': [],
-                    'node': 0}
+        self.map = {'graph': [],
+                    'lane' : [],
+                     'node' : []}
+        self.r_map = {'graph': [],
+                    'lane': [],
+                    'node': []}
+        self.num_of_nodes = 0
         self.g = Graph()
         self.current_pose = -1
         self.destination_pose = -1
         self.direct_velocity = 40 / 3.6  # тактов/лапоть
         self.reverse_velocity = 5 / 3.6   # тактов/лапоть
 
-    def create_map(self, map):
+    def create_map(self, vm_map):
         #  Представляем карту в виде графа
-        self.g.set_num_vertices(map['node'])
-        for i in range(len(map['vertex'])):
-            u = map['vertex'][i][0]
-            v = map['vertex'][i][1]
-            w = map['vertex'][i][2]
-            a = map['vertex'][i][3]
+        self.g.set_num_vertices(self.num_of_nodes)
+        for edge in vm_map['graph']:
+            u = edge[0]
+            v = edge[1]
+            w = edge[2]
+            a = edge[3]
             self.g.addEdge(u, v, w, a)
 
     def create_reverse_map(self):
         # TODO может лучше сделать флаг "Назад" для обработки алгоритмом поиска назад? Вместо копированиея карты
-        self.r_map['vertex'] = copy.deepcopy(self.map['vertex'])
-        self.r_map['node'] = self.map['node']
+        self.r_map = copy.deepcopy(self.map)
 
-        for i in range(len(self.r_map['vertex'])):
-            self.r_map['vertex'][i][0], self.r_map['vertex'][i][1] \
-                = self.r_map['vertex'][i][1], self.r_map['vertex'][i][0]
+        for edge in self.r_map['graph']:
+            edge[0], edge[1] = edge[1], edge[0]
 
 
     def load_map(self, route_map):
         # TODO Здесь нет проверки вменяемости карты
-        self.map['vertex'] = copy.deepcopy(route_map['vertex'])
-        self.map['node'] = route_map['node']
+        self.map = copy.deepcopy(route_map)
+        self.num_of_nodes = len(route_map['node'])
+
         self.create_map(self.map)
         self.create_reverse_map()
 
@@ -73,6 +75,7 @@ class route_planner:
         pred_and_distance_array = self.g.BellmanFord(self.current_pose)
 
         path = []
+        wps = []
         # Прежде чем вернуть путь до точки назначение, нужно убедиться в ее доступности.
         if pred_and_distance_array[0][self.destination_pose] != -1:
 
@@ -91,7 +94,12 @@ class route_planner:
             path.reverse()
             state = 'Direct route is found'
 
-            output = [state, path]
+            for lane in self.map['lane']:
+                for i in range(len(path)-1):
+                    if lane.identification[0] == path[i] and lane.identification[1] == path[i+1]:
+                        wps.extend(lane.wp_array)
+
+            output = [state, path, wps]
             return output
         else:
 
