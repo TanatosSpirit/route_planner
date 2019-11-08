@@ -16,8 +16,13 @@ class route_planner:
         self.g = Graph()
         self.current_pose = -1
         self.destination_pose = -1
-        self.direct_velocity = 40 / 3.6  # тактов/лапоть
-        self.reverse_velocity = 5 / 3.6   # тактов/лапоть
+        self.direct_velocity = 0   # тактов/лапоть
+        self.reverse_velocity = 0    # тактов/лапоть
+
+
+    def settings(self, direct, reverse):
+        self.direct_velocity = direct / 3.6
+        self.reverse_velocity = reverse / 3.6
 
     def create_map(self, vm_map):
         #  Представляем карту в виде графа
