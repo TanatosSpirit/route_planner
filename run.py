@@ -19,7 +19,7 @@ vm_map = vml.read_file(filepath)
 
 viz.new_fig()
 viz.take_map(vm_map)
-viz.show()
+
 
 # передали карту планировщику (прослушали топик с векторной картой)
 if test == True:
@@ -38,3 +38,6 @@ rp.set_destination_point(destination_pose)
 # Получаем вывод о доступности точки назначения и маршрут(траекторию) до нее
 route = rp.get_path() # TODO это набор путевых точек, что это? Траектория?
 print(route)
+viz.take_route(route)
+
+viz.show()
