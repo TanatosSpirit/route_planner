@@ -124,6 +124,7 @@ class VMLoader:
                     for lane in self.lane_obj_array:
                         if lane.vm_id == int(id):
                             node_obj.add_input_lane_id(lane.obj_id)
+                            lane.set_destination_node(node_obj.obj_id)
 
                 # OUTPUT_LANE_ID
                 line = file_object.readline()
@@ -135,6 +136,7 @@ class VMLoader:
                     for lane in self.lane_obj_array:
                         if lane.vm_id == int(id):
                             node_obj.add_output_lane_id(lane.obj_id)
+                            lane.set_source_node(node_obj.obj_id)
 
 
                 self.node_obj_array.append(node_obj)

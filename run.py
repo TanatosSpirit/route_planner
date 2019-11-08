@@ -1,20 +1,33 @@
 from libs.route_planner import route_planner
 from test_map import test_map
+from libs.vmloader import VMLoader
+
+test = False
 
 # создаем планировщик (запустили ROS-ноду)
 rp = route_planner()
 
-# загрузили карту (прослушали топик с векторной картой)
-rp.load_map(test_map)
+# создаем загрузчик карты (запустили ROS-ноду)
+vml = VMLoader()
 
-vehicle_pose = 8  # номер узла
+# загрузили карта из файла и получили структуру с файлом (создали топик с картой)
+filepath = 'data\\MiniPolygonGraph.namivm'
+vm_map = vml.read_file(filepath)
+
+# передали карту планировщику (прослушали топик с векторной картой)
+if test == True:
+    rp.load_map(test_map)
+else:
+    rp.load_map(vm_map)
+
+vehicle_pose = 3  # номер узла
 # установили текущее положение ТС (прослушали топик с положением машины)
 rp.set_current_pose(vehicle_pose)
 
-destination_pose = 6  # номер узла
+destination_pose = 1  # номер узла
 # указали куда нужно приехать
 rp.set_destination_point(destination_pose)
 
-# Получаем вывод о доступности точки назначения и маршрут до нее
-route = rp.get_path()
+# Получаем вывод о доступности точки назначения и маршрут(траекторию) до нее
+route = rp.get_path() # TODO это набор путевых точек, что это? Траектория?
 print(route)

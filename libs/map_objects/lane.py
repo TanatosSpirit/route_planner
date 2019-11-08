@@ -10,6 +10,7 @@ class Lane(MapObject):
         self.num_of_wp = -1
         self.wp_array = []
         self.length = 0
+        self.identification = [-1, -1]
 
     def add_speed(self, speed):
         self.speed = speed
@@ -33,3 +34,9 @@ class Lane(MapObject):
     def add_wp(self, wp):
         self.wp_array.append(wp)
         self.compute_length()
+
+    def set_source_node(self, node):
+        self.identification[0] = node
+
+    def set_destination_node(self, node):
+        self.identification[1] = node
