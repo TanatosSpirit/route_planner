@@ -1,8 +1,11 @@
 from libs.route_planner import route_planner
 from test_map import test_map
 from libs.vmloader import VMLoader
+from libs.viz.visualizer import Visualizer
 
 test = False
+
+viz = Visualizer()
 
 # создаем планировщик (запустили ROS-ноду)
 rp = route_planner()
@@ -13,6 +16,10 @@ vml = VMLoader()
 # загрузили карта из файла и получили структуру с файлом (создали топик с картой)
 filepath = 'data\\MiniPolygonGraph.namivm'
 vm_map = vml.read_file(filepath)
+
+viz.new_fig()
+viz.take_map(vm_map)
+viz.show()
 
 # передали карту планировщику (прослушали топик с векторной картой)
 if test == True:
