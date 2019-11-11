@@ -40,7 +40,7 @@ class Visualizer:
     def take_map(self, input_map):
         self.vm_map = copy.deepcopy(input_map)
 
-        for lane in self.vm_map.lane:
+        for lane in self.vm_map.lanes:
             x = [i[0] for i in lane.wp_array]
             y = [j[1] for j in lane.wp_array]
             z = [k[2] for k in lane.wp_array]
@@ -55,7 +55,7 @@ class Visualizer:
 
         self.figs[-1][1].scatter(self.x_wp, self.y_wp, s=10, color='green')
 
-        for node in self.vm_map.node:
+        for node in self.vm_map.nodes:
             x = node.xyz[0]
             y = node.xyz[1]
             z = node.xyz[2]

@@ -12,3 +12,12 @@ def compute_direction(p1, p2):
         dir = -dir
 
     return dir
+
+def add_direction(lane_obj, i):
+
+    p2 = lane_obj.wp_array[i]
+    p1 = lane_obj.wp_array[i - 1]
+
+    alfa = compute_direction(p1, p2)
+
+    lane_obj.wp_array[-2][3] = alfa

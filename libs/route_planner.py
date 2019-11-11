@@ -45,7 +45,7 @@ class route_planner:
     def load_map(self, vector_map):
         # TODO Здесь нет проверки вменяемости карты
         self.vm_map = copy.deepcopy(vector_map)
-        self.num_of_nodes = len(vector_map.node)
+        self.num_of_nodes = len(vector_map.nodes)
 
         self.create_map(self.vm_map)
         self.create_reverse_map()
@@ -86,7 +86,7 @@ class route_planner:
         nearest_node = -1
 
         lane_id = 0
-        for lane in self.vm_map.lane:
+        for lane in self.vm_map.lanes:
             for i in range(len(lane.wp_array)):
                 wp = lane.wp_array[i]
                 dist = np.linalg.norm(np.array(pose) - np.array([wp[0], wp[1], wp[2]]))
@@ -153,16 +153,16 @@ class route_planner:
             path.reverse()
             state = 'Direct route is found'
 
-            for i in range(self.src_relative.wp_id, len(self.vm_map.lane[self.src_relative.lane_id].wp_array)):
-                wps.append(self.vm_map.lane[self.src_relative.lane_id].wp_array[i])
+            for i in range(self.src_relative.wp_id, len(self.vm_map.lanes[self.src_relative.lane_id].wp_array)):
+                wps.append(self.vm_map.lanes[self.src_relative.lane_id].wp_array[i])
 
-            for lane in self.vm_map.lane:
+            for lane in self.vm_map.lanes:
                 for i in range(len(path)-1):
                     if lane.identification[0] == path[i] and lane.identification[1] == path[i+1]:
                         wps.extend(lane.wp_array)
 
             for i in range(0, self.dist_relative.wp_id):
-                wps.append(self.vm_map.lane[self.dist_relative.lane_id].wp_array[i])
+                wps.append(self.vm_map.lanes[self.dist_relative.lane_id].wp_array[i])
 
             output = [state, path, wps]
             return output

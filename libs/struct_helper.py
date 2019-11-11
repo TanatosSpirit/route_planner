@@ -12,5 +12,5 @@ class VmMap:
 
     def __init__(self):
         self.graph = []
-        self.lane = []
-        self.node = []
+        self.lanes = []
+        self.nodes = []
