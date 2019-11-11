@@ -29,11 +29,12 @@ if test == True:
 else:
     rp.load_map(vm_map)
 
-vehicle_pose = 1  # номер узла
+vehicle_pose = [-26., -11., 42., 0]  # вектор положения в пространстве (x, y, z, азимут)
 # установили текущее положение ТС (прослушали топик с положением машины)
 rp.set_current_pose(vehicle_pose)
+viz.take_vehicle_pose(vehicle_pose)
 
-destination_pose = 0  # номер узла
+destination_pose = [16., 25., 0, 0]  # вектор положения в пространстве (x, y, z, азимут)
 # указали куда нужно приехать
 rp.set_destination_point(destination_pose)
 

@@ -2,6 +2,7 @@
 # from bellman_ford import Graph
 from bellman_ford_extended import Graph
 import copy
+import numpy as np
 
 class route_planner:
 
@@ -18,6 +19,20 @@ class route_planner:
         self.destination_pose = -1
         self.direct_velocity = 0   # тактов/лапоть
         self.reverse_velocity = 0    # тактов/лапоть
+
+        self.src_node_id = 0
+        self.src_wp_id = 0
+        self.src_lane_id = 0
+        self.src_nearest_wp = 0
+        self.src_angle = 0
+
+        self.dist_node_id = 0
+        self.dist_wp_id = 0
+        self.dist_lane_id = 0
+        self.dist_nearest_wp = 0
+        self.dist_angle = 0
+
+
 
 
     def settings(self, direct, reverse):
@@ -72,23 +87,75 @@ class route_planner:
 
         return common_elements
 
+    def compute_dif_angle
+
+    def find_nearest_node(self, direction):
+        if direction == 'forward':
+            pose = [self.current_pose[0], self.current_pose[1], self.current_pose[2]]
+        else:
+            pose = [self.destination_pose[0], self.destination_pose[1], self.destination_pose[2]]
+
+        nearest_wp = float("Inf")
+        nearest_node = -1
+
+        lane_id = 0
+        for lane in self.map['lane']:
+            for i in range(len(lane.wp_array)):
+                wp = lane.wp_array[i]
+                dist = np.linalg.norm(np.array(pose) - np.array([wp[0], wp[1], wp[2]]))
+
+                if dist < nearest_wp:
+
+                    if direction == 'forward':
+                        nearest_node = lane.identification[1]
+                        self.src_wp_id = i
+                        self.src_lane_id = lane_id
+                        self.src_nearest_wp = dist
+                    else:
+                        nearest_node = lane.identification[0]
+                        self.dist_wp_id = i
+                        self.dist_lane_id = lane_id
+                        self.dist_nearest_wp = dist
+
+                    nearest_wp = dist
+
+
+
+
+            lane_id += 1
+
+        return nearest_node
+
     def get_path(self):
+
+        self.src_node_id = self.find_nearest_node('forward')
+
         # Начинаем движение из узла current_pose и ищем путь до узла destination_pose. Для этого выполняем алгоритм
         # Беллмана-Форда и находим все кратчайшие пути от узла current_pose до всех других узлов. Здесь мы получаем
         # массив предков в котором порядковый номер элемента соответствует номеру узла,
         # а содержащееся значение говорит о предшественнике.
-        pred_and_distance_array = self.g.BellmanFord(self.current_pose)
+        pred_and_distance_array = self.g.BellmanFord(self.src_node_id)
 
         path = []
         wps = []
         # Прежде чем вернуть путь до точки назначение, нужно убедиться в ее доступности.
-        if pred_and_distance_array[0][self.destination_pose] != -1:
+        self.dist_node_id = self.find_nearest_node('backward')
+
+        if self.src_nearest_wp > 4:
+            state = 'Lane is too far'
+            path = []
+            wps = []
+
+            output = [state, path, wps]
+            return output
+
+        if pred_and_distance_array[0][self.dist_node_id] != -1:
 
             # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
             # TODO восстановление пути можно сделать проще или вынести в отдельный метод
             reached = False
 
-            current = self.destination_pose
+            current = self.dist_node_id
             while not reached:
                 path.append(current)
                 current = pred_and_distance_array[0][current]
@@ -99,10 +166,17 @@ class route_planner:
             path.reverse()
             state = 'Direct route is found'
 
+
+            for i in range(self.src_wp_id, len(self.map['lane'][self.src_lane_id].wp_array)):
+                wps.append(self.map['lane'][self.src_lane_id].wp_array[i])
+
             for lane in self.map['lane']:
                 for i in range(len(path)-1):
                     if lane.identification[0] == path[i] and lane.identification[1] == path[i+1]:
                         wps.extend(lane.wp_array)
+
+            for i in range(0, self.dist_wp_id):
+                wps.append(self.map['lane'][self.dist_lane_id].wp_array[i])
 
             output = [state, path, wps]
             return output

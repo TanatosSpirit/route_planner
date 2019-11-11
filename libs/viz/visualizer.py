@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import copy
+import math
 
 
 class Visualizer:
@@ -26,6 +27,8 @@ class Visualizer:
         self.y_route = []
         self.z_route = []
 
+        self.vehicle_pose = []
+
     def show(self):
         plt.show()
 
@@ -40,10 +43,14 @@ class Visualizer:
             x = [i[0] for i in lane.wp_array]
             y = [j[1] for j in lane.wp_array]
             z = [k[2] for k in lane.wp_array]
+            w = [l[2] for l in lane.wp_array]
 
             self.x_wp.extend(x)
             self.y_wp.extend(y)
             self.z_wp.extend(z)
+
+            for x, y, z, w in lane.wp_array:
+                self.figs[-1][1].arrow(x, y, 0.5 * math.cos(w), 0.5 * math.sin(w), head_width=0.2, head_length=0.3, alpha=0.6)
 
         self.figs[-1][1].scatter(self.x_wp, self.y_wp, s=10, color='green')
 
@@ -79,6 +86,17 @@ class Visualizer:
 
         self.figs[-1][1].scatter(self.x_route, self.y_route, s=10, color='red')
 
+    def take_vehicle_pose(self, vehicle_pose):
+        self.vehicle_pose = vehicle_pose.copy()
+
+        x = self.vehicle_pose[0]
+        y = self.vehicle_pose[1]
+        z = self.vehicle_pose[2]
+        w = self.vehicle_pose[3]
+
+
+        self.figs[-1][1].scatter(x, y, s=20, color='blue')
+        self.figs[-1][1].arrow(x, y, 0.5 * math.cos(w), 0.5 * math.sin(w), head_width=0.2, head_length=0.3, alpha=0.6)
 
 if __name__ == '__main__':
     viz = Visualizer()

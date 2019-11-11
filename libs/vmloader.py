@@ -1,5 +1,6 @@
 from lane import Lane
 from node import Node
+import math
 
 
 class VMLoader:
@@ -20,6 +21,20 @@ class VMLoader:
         self.map = {'graph': [],
                     'lane' : [],
                     'node' : []}
+
+    def compute_direction(self, p1, p2):
+
+        p_x = p2[0] - p1[0]
+        p_y = p2[1] - p1[1]
+        p_z = p2[2] - p1[2]
+
+        norm = math.sqrt(p_x * p_x + p_y * p_y)
+        dir = math.acos(p_x / norm)
+
+        if p_y < 0:
+            dir = -dir
+
+        return dir
 
     def read_file_v01(self, file_object):
         line = file_object.readline()
@@ -71,7 +86,20 @@ class VMLoader:
                     x = float(line[0])
                     y = float(line[1])
                     z = float(line[2])
-                    lane_obj.add_wp([x, y, z])
+                    alfa = 0
+
+                    lane_obj.add_wp([x, y, z, alfa])
+
+                    if i > 0:
+                        p2 = lane_obj.wp_array[i]
+                        p1 = lane_obj.wp_array[i - 1]
+
+                        alfa = self.compute_direction(p1, p2)
+
+                        lane_obj.wp_array[-2][3] = alfa
+
+                lane_obj.wp_array[-1][3] = alfa
+
 
                 self.lane_obj_array.append(lane_obj)
 
