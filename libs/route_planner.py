@@ -1,28 +1,33 @@
 # в настроках проекта в PyCharm юзал папку lib/bellman-ford как source
 # from bellman_ford import Graph
 from bellman_ford_extended import Graph
+from libs.struct_helper import RelativeInfo, VmMap
 import copy
+import numpy as np
 
 class route_planner:
 
     def __init__(self):
-        self.map = {'graph': [],
-                    'lane' : [],
-                     'node' : []}
-        self.r_map = {'graph': [],
-                    'lane': [],
-                    'node': []}
+        self.vm_map = VmMap()
+        self.r_vm_map = VmMap()
         self.num_of_nodes = 0
         self.g = Graph()
-        self.current_pose = -1
-        self.destination_pose = -1
-        self.direct_velocity = 40 / 3.6  # тактов/лапоть
-        self.reverse_velocity = 5 / 3.6   # тактов/лапоть
+        self.current_pose = []
+        self.destination_pose = []
+        self.direct_velocity = 0   # тактов/лапоть
+        self.reverse_velocity = 0    # тактов/лапоть
+
+        self.src_relative = RelativeInfo()
+        self.dist_relative = RelativeInfo()
+
+    def settings(self, direct, reverse):
+        self.direct_velocity = direct / 3.6
+        self.reverse_velocity = reverse / 3.6
 
     def create_map(self, vm_map):
         #  Представляем карту в виде графа
         self.g.set_num_vertices(self.num_of_nodes)
-        for edge in vm_map['graph']:
+        for edge in vm_map.graph:
             u = edge[0]
             v = edge[1]
             w = edge[2]
@@ -31,18 +36,18 @@ class route_planner:
 
     def create_reverse_map(self):
         # TODO может лучше сделать флаг "Назад" для обработки алгоритмом поиска назад? Вместо копированиея карты
-        self.r_map = copy.deepcopy(self.map)
+        self.r_vm_map = copy.deepcopy(self.vm_map)
 
-        for edge in self.r_map['graph']:
+        for edge in self.r_vm_map.graph:
             edge[0], edge[1] = edge[1], edge[0]
 
 
-    def load_map(self, route_map):
+    def load_map(self, vector_map):
         # TODO Здесь нет проверки вменяемости карты
-        self.map = copy.deepcopy(route_map)
-        self.num_of_nodes = len(route_map['node'])
+        self.vm_map = copy.deepcopy(vector_map)
+        self.num_of_nodes = len(vector_map.node)
 
-        self.create_map(self.map)
+        self.create_map(self.vm_map)
         self.create_reverse_map()
 
     def set_current_pose(self, pose):
@@ -52,6 +57,7 @@ class route_planner:
         self.destination_pose = dest
 
     def find_predecessors(self, node):
+        # TODO не используется
         predecessors = []
         for i in range(len(self.map['vertex'])):
             if self.map['vertex'][i][1] == node:
@@ -67,23 +73,76 @@ class route_planner:
 
         return common_elements
 
+    def compute_dif_angle(self):
+        pass
+
+    def find_nearest_node(self, direction):
+        if direction == 'forward':
+            pose = [self.current_pose[0], self.current_pose[1], self.current_pose[2]]
+        else:
+            pose = [self.destination_pose[0], self.destination_pose[1], self.destination_pose[2]]
+
+        nearest_wp = float("Inf")
+        nearest_node = -1
+
+        lane_id = 0
+        for lane in self.vm_map.lane:
+            for i in range(len(lane.wp_array)):
+                wp = lane.wp_array[i]
+                dist = np.linalg.norm(np.array(pose) - np.array([wp[0], wp[1], wp[2]]))
+
+                if dist < nearest_wp:
+
+                    if direction == 'forward':
+                        nearest_node = lane.identification[1]
+                        self.src_relative.wp_id = i
+                        self.src_relative.lane_id = lane_id
+                        self.src_relative.nearest_wp = dist
+                    else:
+                        nearest_node = lane.identification[0]
+                        self.dist_relative.wp_id = i
+                        self.dist_relative.lane_id = lane_id
+                        self.dist_relative.nearest_wp = dist
+
+                    nearest_wp = dist
+
+
+
+
+            lane_id += 1
+
+        return nearest_node
+
     def get_path(self):
+
+        self.src_relative.node_id = self.find_nearest_node('forward')
+
         # Начинаем движение из узла current_pose и ищем путь до узла destination_pose. Для этого выполняем алгоритм
         # Беллмана-Форда и находим все кратчайшие пути от узла current_pose до всех других узлов. Здесь мы получаем
         # массив предков в котором порядковый номер элемента соответствует номеру узла,
         # а содержащееся значение говорит о предшественнике.
-        pred_and_distance_array = self.g.BellmanFord(self.current_pose)
+        pred_and_distance_array = self.g.BellmanFord(self.src_relative.node_id)
 
         path = []
         wps = []
         # Прежде чем вернуть путь до точки назначение, нужно убедиться в ее доступности.
-        if pred_and_distance_array[0][self.destination_pose] != -1:
+        self.dist_relative.node_id = self.find_nearest_node('backward')
+
+        if self.src_relative.nearest_wp > 4:
+            state = 'Lane is too far'
+            path = []
+            wps = []
+
+            output = [state, path, wps]
+            return output
+
+        if pred_and_distance_array[0][self.dist_relative.node_id] != -1:
 
             # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
             # TODO восстановление пути можно сделать проще или вынести в отдельный метод
             reached = False
 
-            current = self.destination_pose
+            current = self.dist_relative.node_id
             while not reached:
                 path.append(current)
                 current = pred_and_distance_array[0][current]
@@ -94,10 +153,16 @@ class route_planner:
             path.reverse()
             state = 'Direct route is found'
 
-            for lane in self.map['lane']:
+            for i in range(self.src_relative.wp_id, len(self.vm_map.lane[self.src_relative.lane_id].wp_array)):
+                wps.append(self.vm_map.lane[self.src_relative.lane_id].wp_array[i])
+
+            for lane in self.vm_map.lane:
                 for i in range(len(path)-1):
                     if lane.identification[0] == path[i] and lane.identification[1] == path[i+1]:
                         wps.extend(lane.wp_array)
+
+            for i in range(0, self.dist_relative.wp_id):
+                wps.append(self.vm_map.lane[self.dist_relative.lane_id].wp_array[i])
 
             output = [state, path, wps]
             return output
@@ -105,7 +170,7 @@ class route_planner:
 
             # сбрасываю старую карту и загружаю обратную карту
             self.g.reset_map()
-            self.create_map(self.r_map)
+            self.create_map(self.r_vm_map)
 
             pred_and_distance_array = self.g.BellmanFord(self.current_pose)
 

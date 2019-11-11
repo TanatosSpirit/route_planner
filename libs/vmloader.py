@@ -1,5 +1,7 @@
 from lane import Lane
 from node import Node
+from libs.struct_helper import VmMap
+from libs.math_helper import compute_direction
 
 
 class VMLoader:
@@ -14,9 +16,7 @@ class VMLoader:
         self.nodeID = 0
         self.graph = []
         self.available = 1
-        self.map = {'graph': [],
-                    'lane' : [],
-                    'node' : []}
+        self.vm_map = VmMap()
 
     def read_file_v01(self, file_object):
         line = file_object.readline()
@@ -61,6 +61,7 @@ class VMLoader:
                 num_of_points = int(line.split("#")[1])
                 lane_obj.add_num_of_points(num_of_points)
 
+                alfa = 0
                 for i in range(num_of_points):
                     line = file_object.readline()
                     line = line.strip("\n")
@@ -68,7 +69,20 @@ class VMLoader:
                     x = float(line[0])
                     y = float(line[1])
                     z = float(line[2])
-                    lane_obj.add_wp([x, y, z])
+
+
+                    lane_obj.add_wp([x, y, z, alfa])
+
+                    if i > 0:
+                        p2 = lane_obj.wp_array[i]
+                        p1 = lane_obj.wp_array[i - 1]
+
+                        alfa = compute_direction(p1, p2)
+
+                        lane_obj.wp_array[-2][3] = alfa
+
+                lane_obj.wp_array[-1][3] = alfa
+
 
                 self.lane_obj_array.append(lane_obj)
 
@@ -171,9 +185,9 @@ class VMLoader:
                         exit_flag = False
                         break
 
-        self.map['graph'] = self.graph
-        self.map['lane'] = self.lane_obj_array
-        self.map['node'] = self.node_obj_array
+        self.vm_map.graph = self.graph
+        self.vm_map.lane = self.lane_obj_array
+        self.vm_map.node = self.node_obj_array
 
 
     def read_file(self, filepath):
@@ -200,7 +214,7 @@ class VMLoader:
                 self.read_file_v01(file_object)
 
         # return [self.lane_obj_array, self.node_obj_array]
-        return self.map
+        return self.vm_map
 
 if __name__ == '__main__':
     filepath = '..\\data\\MiniPolygonGraph.namivm'
