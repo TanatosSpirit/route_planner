@@ -56,25 +56,22 @@ class Visualizer:
             self.y_node.append(y)
             self.z_node.append(z)
 
+            # Annotate the nodes
+            self.figs[-1][1].annotate(node.obj_id,
+                                      xy=(x, y), xycoords='data',
+                                      xytext=(20, 20), textcoords='offset points', fontsize=16,
+                                      arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"))
+
         self.figs[-1][1].scatter(self.x_node, self.y_node, s=50, color='green')
+
+
 
     def take_route(self, route):
         self.route_node = route.copy()
 
-        for i in self.route_node[1]:
-            self.x_node_route.append(self.x_node[i])
-            self.y_node_route.append(self.y_node[i])
-            self.z_node_route.append(self.z_node[i])
-
-            self.x_node.remove(self.x_node[i])
-            self.y_node.remove(self.y_node[i])
-            self.z_node.remove(self.z_node[i])
-
-        self.figs[-1][1].scatter(self.x_node_route, self.y_node_route, s=50, color='red')
-
-        x = [i[0] for i in route[2]]
-        y = [j[1] for j in route[2]]
-        z = [k[2] for k in route[2]]
+        x = [i[0] for i in self.route_node[2]]
+        y = [j[1] for j in self.route_node[2]]
+        z = [k[2] for k in self.route_node[2]]
 
         self.x_route.extend(x)
         self.y_route.extend(y)

@@ -29,17 +29,17 @@ if test == True:
 else:
     rp.load_map(vm_map)
 
-vehicle_pose = 3  # номер узла
+vehicle_pose = 1  # номер узла
 # установили текущее положение ТС (прослушали топик с положением машины)
 rp.set_current_pose(vehicle_pose)
 
-destination_pose = 1  # номер узла
+destination_pose = 0  # номер узла
 # указали куда нужно приехать
 rp.set_destination_point(destination_pose)
 
 # Получаем вывод о доступности точки назначения и маршрут(траекторию) до нее
 route = rp.get_path() # TODO это набор путевых точек, что это? Траектория?
-print(route)
+print(route[0], ": ", route[1])
 viz.take_route(route)
 
 viz.show()
