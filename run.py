@@ -2,6 +2,7 @@ from libs.route_planner import route_planner
 from test_map import test_map
 from libs.vmloader import VMLoader
 from libs.viz.visualizer import Visualizer
+from libs.struct_helper import VmMap
 
 test = False
 

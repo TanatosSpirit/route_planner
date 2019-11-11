@@ -1,14 +1,12 @@
 from lane import Lane
 from node import Node
-import math
+from libs.struct_helper import VmMap
+from libs.math_helper import compute_direction
 
 
 class VMLoader:
     """
             Загружает файл с векторной картой и формирует структуры с которыми работает планировщик
-
-
-
     """
 
     def __init__(self):
@@ -18,23 +16,7 @@ class VMLoader:
         self.nodeID = 0
         self.graph = []
         self.available = 1
-        self.map = {'graph': [],
-                    'lane' : [],
-                    'node' : []}
-
-    def compute_direction(self, p1, p2):
-
-        p_x = p2[0] - p1[0]
-        p_y = p2[1] - p1[1]
-        p_z = p2[2] - p1[2]
-
-        norm = math.sqrt(p_x * p_x + p_y * p_y)
-        dir = math.acos(p_x / norm)
-
-        if p_y < 0:
-            dir = -dir
-
-        return dir
+        self.vm_map = VmMap()
 
     def read_file_v01(self, file_object):
         line = file_object.readline()
@@ -79,6 +61,7 @@ class VMLoader:
                 num_of_points = int(line.split("#")[1])
                 lane_obj.add_num_of_points(num_of_points)
 
+                alfa = 0
                 for i in range(num_of_points):
                     line = file_object.readline()
                     line = line.strip("\n")
@@ -86,7 +69,7 @@ class VMLoader:
                     x = float(line[0])
                     y = float(line[1])
                     z = float(line[2])
-                    alfa = 0
+
 
                     lane_obj.add_wp([x, y, z, alfa])
 
@@ -94,7 +77,7 @@ class VMLoader:
                         p2 = lane_obj.wp_array[i]
                         p1 = lane_obj.wp_array[i - 1]
 
-                        alfa = self.compute_direction(p1, p2)
+                        alfa = compute_direction(p1, p2)
 
                         lane_obj.wp_array[-2][3] = alfa
 
@@ -202,9 +185,9 @@ class VMLoader:
                         exit_flag = False
                         break
 
-        self.map['graph'] = self.graph
-        self.map['lane'] = self.lane_obj_array
-        self.map['node'] = self.node_obj_array
+        self.vm_map.graph = self.graph
+        self.vm_map.lane = self.lane_obj_array
+        self.vm_map.node = self.node_obj_array
 
 
     def read_file(self, filepath):
@@ -231,7 +214,7 @@ class VMLoader:
                 self.read_file_v01(file_object)
 
         # return [self.lane_obj_array, self.node_obj_array]
-        return self.map
+        return self.vm_map
 
 if __name__ == '__main__':
     filepath = '..\\data\\MiniPolygonGraph.namivm'

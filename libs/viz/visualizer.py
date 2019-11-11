@@ -1,3 +1,5 @@
+from libs.struct_helper import VmMap
+
 import matplotlib.pyplot as plt
 import copy
 import math
@@ -6,9 +8,8 @@ import math
 class Visualizer:
     def __init__(self):
         self.figs = []
-        self.vm_map = {'graph': [],
-                        'lane': [],
-                        'node': []}
+        self.vm_map = VmMap()
+
         self.x_wp = []
         self.y_wp = []
         self.z_wp = []
@@ -36,10 +37,10 @@ class Visualizer:
         fig_graph, ax = plt.subplots(1, 1, sharex='all', sharey='all', figsize=(9, 9))
         self.figs.append([fig_graph, ax])
 
-    def take_map(self, vm_map):
-        self.vm_map = copy.deepcopy(vm_map)
+    def take_map(self, input_map):
+        self.vm_map = copy.deepcopy(input_map)
 
-        for lane in self.vm_map['lane']:
+        for lane in self.vm_map.lane:
             x = [i[0] for i in lane.wp_array]
             y = [j[1] for j in lane.wp_array]
             z = [k[2] for k in lane.wp_array]
@@ -54,7 +55,7 @@ class Visualizer:
 
         self.figs[-1][1].scatter(self.x_wp, self.y_wp, s=10, color='green')
 
-        for node in self.vm_map['node']:
+        for node in self.vm_map.node:
             x = node.xyz[0]
             y = node.xyz[1]
             z = node.xyz[2]
