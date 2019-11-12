@@ -1,4 +1,4 @@
-from libs.struct_helper import VmMap
+from struct_helper import VmMap
 
 import matplotlib.pyplot as plt
 import copy
@@ -75,7 +75,8 @@ class Visualizer:
 
 
     def take_route(self, route):
-        self.route_node = route.copy()
+        self.route_node = copy.deepcopy(route)
+        # self.route_node = route.copy()
 
         x = [i[0] for i in self.route_node[2]]
         y = [j[1] for j in self.route_node[2]]
@@ -88,7 +89,8 @@ class Visualizer:
         self.figs[-1][1].scatter(self.x_route, self.y_route, s=10, color='red')
 
     def take_vehicle_pose(self, vehicle_pose):
-        self.vehicle_pose = vehicle_pose.copy()
+        self.vehicle_pose = copy.deepcopy(vehicle_pose)
+        # self.vehicle_pose = vehicle_pose.copy()
 
         x = self.vehicle_pose[0]
         y = self.vehicle_pose[1]

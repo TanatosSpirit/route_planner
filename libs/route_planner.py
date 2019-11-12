@@ -1,7 +1,9 @@
-# РІ РЅР°СЃС‚СЂРѕРєР°С… РїСЂРѕРµРєС‚Р° РІ PyCharm СЋР·Р°Р» РїР°РїРєСѓ lib/bellman-ford РєР°Рє source
+# coding=cp1251
+
+# в настроках проекта в PyCharm юзал папку lib/bellman-ford как source
 # from bellman_ford import Graph
 from bellman_ford_extended import Graph
-from libs.struct_helper import RelativeInfo, VmMap
+from struct_helper import RelativeInfo, VmMap
 import copy
 import numpy as np
 
@@ -14,8 +16,8 @@ class route_planner:
         self.g = Graph()
         self.current_pose = []
         self.destination_pose = []
-        self.direct_velocity = 0   # С‚Р°РєС‚РѕРІ/Р»Р°РїРѕС‚СЊ
-        self.reverse_velocity = 0    # С‚Р°РєС‚РѕРІ/Р»Р°РїРѕС‚СЊ
+        self.direct_velocity = 0   # тактов/лапоть
+        self.reverse_velocity = 0    # тактов/лапоть
 
         self.src_relative = RelativeInfo()
         self.dist_relative = RelativeInfo()
@@ -25,7 +27,7 @@ class route_planner:
         self.reverse_velocity = reverse / 3.6
 
     def create_map(self, vm_map):
-        #  РџСЂРµРґСЃС‚Р°РІР»СЏРµРј РєР°СЂС‚Сѓ РІ РІРёРґРµ РіСЂР°С„Р°
+        #  Представляем карту в виде графа
         self.g.set_num_vertices(self.num_of_nodes)
         for edge in vm_map.graph:
             u = edge[0]
@@ -35,7 +37,7 @@ class route_planner:
             self.g.addEdge(u, v, w, a)
 
     def create_reverse_map(self):
-        # TODO РјРѕР¶РµС‚ Р»СѓС‡С€Рµ СЃРґРµР»Р°С‚СЊ С„Р»Р°Рі "РќР°Р·Р°Рґ" РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё Р°Р»РіРѕСЂРёС‚РјРѕРј РїРѕРёСЃРєР° РЅР°Р·Р°Рґ? Р’РјРµСЃС‚Рѕ РєРѕРїРёСЂРѕРІР°РЅРёРµСЏ РєР°СЂС‚С‹
+        # TODO может лучше сделать флаг "Назад" для обработки алгоритмом поиска назад? Вместо копированиея карты
         self.r_vm_map = copy.deepcopy(self.vm_map)
 
         for edge in self.r_vm_map.graph:
@@ -43,7 +45,7 @@ class route_planner:
 
 
     def load_map(self, vector_map):
-        # TODO Р—РґРµСЃСЊ РЅРµС‚ РїСЂРѕРІРµСЂРєРё РІРјРµРЅСЏРµРјРѕСЃС‚Рё РєР°СЂС‚С‹
+        # TODO Здесь нет проверки вменяемости карты
         self.vm_map = copy.deepcopy(vector_map)
         self.num_of_nodes = len(vector_map.nodes)
 
@@ -57,7 +59,7 @@ class route_planner:
         self.destination_pose = dest
 
     def find_predecessors(self, node):
-        # TODO РЅРµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ
+        # TODO не используется
         predecessors = []
         for i in range(len(self.map['vertex'])):
             if self.map['vertex'][i][1] == node:
@@ -117,15 +119,15 @@ class route_planner:
 
         self.src_relative.node_id = self.find_nearest_node('forward')
 
-        # РќР°С‡РёРЅР°РµРј РґРІРёР¶РµРЅРёРµ РёР· СѓР·Р»Р° current_pose Рё РёС‰РµРј РїСѓС‚СЊ РґРѕ СѓР·Р»Р° destination_pose. Р”Р»СЏ СЌС‚РѕРіРѕ РІС‹РїРѕР»РЅСЏРµРј Р°Р»РіРѕСЂРёС‚Рј
-        # Р‘РµР»Р»РјР°РЅР°-Р¤РѕСЂРґР° Рё РЅР°С…РѕРґРёРј РІСЃРµ РєСЂР°С‚С‡Р°Р№С€РёРµ РїСѓС‚Рё РѕС‚ СѓР·Р»Р° current_pose РґРѕ РІСЃРµС… РґСЂСѓРіРёС… СѓР·Р»РѕРІ. Р—РґРµСЃСЊ РјС‹ РїРѕР»СѓС‡Р°РµРј
-        # РјР°СЃСЃРёРІ РїСЂРµРґРєРѕРІ РІ РєРѕС‚РѕСЂРѕРј РїРѕСЂСЏРґРєРѕРІС‹Р№ РЅРѕРјРµСЂ СЌР»РµРјРµРЅС‚Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ РЅРѕРјРµСЂСѓ СѓР·Р»Р°,
-        # Р° СЃРѕРґРµСЂР¶Р°С‰РµРµСЃСЏ Р·РЅР°С‡РµРЅРёРµ РіРѕРІРѕСЂРёС‚ Рѕ РїСЂРµРґС€РµСЃС‚РІРµРЅРЅРёРєРµ.
+        # Начинаем движение из узла current_pose и ищем путь до узла destination_pose. Для этого выполняем алгоритм
+        # Беллмана-Форда и находим все кратчайшие пути от узла current_pose до всех других узлов. Здесь мы получаем
+        # массив предков в котором порядковый номер элемента соответствует номеру узла,
+        # а содержащееся значение говорит о предшественнике.
         pred_and_distance_array = self.g.BellmanFord(self.src_relative.node_id)
 
         path = []
         wps = []
-        # РџСЂРµР¶РґРµ С‡РµРј РІРµСЂРЅСѓС‚СЊ РїСѓС‚СЊ РґРѕ С‚РѕС‡РєРё РЅР°Р·РЅР°С‡РµРЅРёРµ, РЅСѓР¶РЅРѕ СѓР±РµРґРёС‚СЊСЃСЏ РІ РµРµ РґРѕСЃС‚СѓРїРЅРѕСЃС‚Рё.
+        # Прежде чем вернуть путь до точки назначение, нужно убедиться в ее доступности.
         self.dist_relative.node_id = self.find_nearest_node('backward')
 
         if self.src_relative.nearest_wp > 4:
@@ -138,8 +140,8 @@ class route_planner:
 
         if pred_and_distance_array[0][self.dist_relative.node_id] != -1:
 
-            # Р—Р°С‚РµРј РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІРµРј РїСѓС‚СЊ РїРѕ РіСЂР°С„Сѓ РѕС‚ СѓР·Р»Р° current_pose РґРѕ destination_pose.
-            # TODO РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСѓС‚Рё РјРѕР¶РЅРѕ СЃРґРµР»Р°С‚СЊ РїСЂРѕС‰Рµ РёР»Рё РІС‹РЅРµСЃС‚Рё РІ РѕС‚РґРµР»СЊРЅС‹Р№ РјРµС‚РѕРґ
+            # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
+            # TODO восстановление пути можно сделать проще или вынести в отдельный метод
             reached = False
 
             current = self.dist_relative.node_id
@@ -168,7 +170,7 @@ class route_planner:
             return output
         else:
 
-            # СЃР±СЂР°СЃС‹РІР°СЋ СЃС‚Р°СЂСѓСЋ РєР°СЂС‚Сѓ Рё Р·Р°РіСЂСѓР¶Р°СЋ РѕР±СЂР°С‚РЅСѓСЋ РєР°СЂС‚Сѓ
+            # сбрасываю старую карту и загружаю обратную карту
             self.g.reset_map()
             self.create_map(self.r_vm_map)
 
@@ -192,7 +194,7 @@ class route_planner:
             node_number = -1
             weight = float("Inf")
             for item in common_elements:
-                if item != -1:  # РІ РѕР±С‰РµРј СЃРїРёСЃРєРµ СЃРѕРґРµСЂР¶РёС‚СЃСЏ -1
+                if item != -1:  # в общем списке содержится -1
 
                     reverse_weight = pred_and_distance_array[1][item] / self.reverse_velocity
                     direct_weith = pred_and_distance_target[1][item] / self.direct_velocity
@@ -202,15 +204,15 @@ class route_planner:
                         weight = local_weight
 
 
-            # TODO РЅР°Р№С‚Рё РјР°С€СЂСѓС‚ РѕС‚ РѕР±С‰РµР№ С‚РѕС‡РєРё РґРѕ src Рё dist
+            # TODO найти машрут от общей точки до src и dist
 
             self.g.reset_map()
             self.create_map(self.map)
 
             pred_and_distance_array = self.g.BellmanFord(node_number)
 
-            # Р—Р°С‚РµРј РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІРµРј РїСѓС‚СЊ РїРѕ РіСЂР°С„Сѓ РѕС‚ СѓР·Р»Р° current_pose РґРѕ destination_pose.
-            # TODO РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСѓС‚Рё РјРѕР¶РЅРѕ СЃРґРµР»Р°С‚СЊ РїСЂРѕС‰Рµ РёР»Рё РІС‹РЅРµСЃС‚Рё РІ РѕС‚РґРµР»СЊРЅС‹Р№ РјРµС‚РѕРґ
+            # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
+            # TODO восстановление пути можно сделать проще или вынести в отдельный метод
             reached = False
             path_backward = []
             current = self.current_pose
@@ -222,8 +224,8 @@ class route_planner:
                     reached = True
 
 
-            # Р—Р°С‚РµРј РІРѕСЃСЃС‚Р°РЅР°РІР»РёРІРµРј РїСѓС‚СЊ РїРѕ РіСЂР°С„Сѓ РѕС‚ СѓР·Р»Р° current_pose РґРѕ destination_pose.
-            # TODO РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РїСѓС‚Рё РјРѕР¶РЅРѕ СЃРґРµР»Р°С‚СЊ РїСЂРѕС‰Рµ РёР»Рё РІС‹РЅРµСЃС‚Рё РІ РѕС‚РґРµР»СЊРЅС‹Р№ РјРµС‚РѕРґ
+            # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
+            # TODO восстановление пути можно сделать проще или вынести в отдельный метод
             reached = False
 
             current = self.destination_pose

@@ -1,6 +1,6 @@
 from lane import Lane
 from node import Node
-from libs.math_helper import add_direction
+from math_helper import add_direction
 
 def get_obj(file_object):
 

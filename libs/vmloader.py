@@ -1,11 +1,11 @@
-from node import Node
-from libs.struct_helper import VmMap
-from libs.parse_helper import get_obj, get_lane_v01, get_node_v01
+# coding=cp1251
+from struct_helper import VmMap
+from parse_helper import get_obj, get_lane_v01, get_node_v01
 
 
 class VMLoader:
     """
-            Р—Р°РіСЂСѓР¶Р°РµС‚ С„Р°Р№Р» СЃ РІРµРєС‚РѕСЂРЅРѕР№ РєР°СЂС‚РѕР№ Рё С„РѕСЂРјРёСЂСѓРµС‚ СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃ РєРѕС‚РѕСЂС‹РјРё СЂР°Р±РѕС‚Р°РµС‚ РїР»Р°РЅРёСЂРѕРІС‰РёРє
+            Загружает файл с векторной картой и формирует структуры с которыми работает планировщик
     """
 
     def __init__(self):
