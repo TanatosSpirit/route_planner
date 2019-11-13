@@ -12,7 +12,6 @@ class route_planner:
     def __init__(self):
         self.vm_map = VmMap()
         self.r_vm_map = VmMap()
-        self.num_of_nodes = 0
         self.g = Graph()
         self.current_pose = []
         self.destination_pose = []
@@ -28,7 +27,7 @@ class route_planner:
 
     def create_map(self, vm_map):
         #  Представляем карту в виде графа
-        self.g.set_num_vertices(self.num_of_nodes)
+        self.g.set_num_vertices(vm_map.num_of_nodes)
         for edge in vm_map.graph:
             u = edge[0]
             v = edge[1]
@@ -47,7 +46,6 @@ class route_planner:
     def load_map(self, vector_map):
         # TODO Здесь нет проверки вменяемости карты
         self.vm_map = copy.deepcopy(vector_map)
-        self.num_of_nodes = len(vector_map.nodes)
 
         self.create_map(self.vm_map)
         self.create_reverse_map()

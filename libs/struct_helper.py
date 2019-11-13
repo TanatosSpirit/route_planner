@@ -14,3 +14,4 @@ class VmMap:
         self.graph = []
         self.lanes = []
         self.nodes = []
+        self.num_of_nodes = 0

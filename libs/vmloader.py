@@ -54,6 +54,9 @@ class VMLoader:
                         exit_flag = False
                         break
 
+        self.vm_map.num_of_nodes = len(self.vm_map.nodes)
+
+
     def read_file(self, filepath):
 
         # open the file and read through it line by line
