@@ -40,6 +40,8 @@ destination_pose = [16., 25., 0, 0]  # вектор положения в пространстве (x, y, z,
 # указали куда нужно приехать
 rp.set_destination_point(destination_pose)
 
+rp.disconnect_node()
+
 # Получаем вывод о доступности точки назначения и маршрут(траекторию) до нее
 route = rp.get_path() # TODO это набор путевых точек, что это? Траектория?
 print(route[0], ": ", route[1])

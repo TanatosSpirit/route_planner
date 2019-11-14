@@ -21,6 +21,8 @@ class route_planner:
         self.src_relative = RelativeInfo()
         self.dist_relative = RelativeInfo()
 
+        self.disconnect = False
+
     def settings(self, direct, reverse):
         self.direct_velocity = direct / 3.6
         self.reverse_velocity = reverse / 3.6
@@ -76,11 +78,11 @@ class route_planner:
     def compute_dif_angle(self):
         pass
 
-    def find_nearest_node(self, direction):
-        if direction == 'forward':
-            pose = [self.current_pose[0], self.current_pose[1], self.current_pose[2]]
-        else:
-            pose = [self.destination_pose[0], self.destination_pose[1], self.destination_pose[2]]
+    def find_nearest_node(self, direction, pose):
+        # if direction == 'forward':
+        #     pose = [self.current_pose[0], self.current_pose[1], self.current_pose[2]]
+        # else:
+        #     pose = [self.destination_pose[0], self.destination_pose[1], self.destination_pose[2]]
 
         nearest_wp = float("Inf")
         nearest_node = -1
@@ -114,8 +116,8 @@ class route_planner:
         return nearest_node
 
     def get_path(self):
-
-        self.src_relative.node_id = self.find_nearest_node('forward')
+        pose = [self.current_pose[0], self.current_pose[1], self.current_pose[2]]
+        self.src_relative.node_id = self.find_nearest_node('forward', pose)
 
         # Начинаем движение из узла current_pose и ищем путь до узла destination_pose. Для этого выполняем алгоритм
         # Беллмана-Форда и находим все кратчайшие пути от узла current_pose до всех других узлов. Здесь мы получаем
@@ -126,7 +128,8 @@ class route_planner:
         path = []
         wps = []
         # Прежде чем вернуть путь до точки назначение, нужно убедиться в ее доступности.
-        self.dist_relative.node_id = self.find_nearest_node('backward')
+        pose = [self.destination_pose[0], self.destination_pose[1], self.destination_pose[2]]
+        self.dist_relative.node_id = self.find_nearest_node('backward', pose)
 
         if self.src_relative.nearest_wp > 4:
             state = 'Lane is too far'
@@ -136,7 +139,8 @@ class route_planner:
             output = [state, path, wps]
             return output
 
-        if pred_and_distance_array[0][self.dist_relative.node_id] != -1:
+        if not self.disconnect:
+        # if pred_and_distance_array[0][self.dist_relative.node_id] != -1:
 
             # Затем восстанавливем путь по графу от узла current_pose до destination_pose.
             # TODO восстановление пути можно сделать проще или вынести в отдельный метод
@@ -243,3 +247,21 @@ class route_planner:
 
             output = [state, path_backward, path]
             return output
+
+    def disconnect_node(self):
+        self.disconnect = True
+
+        pose = [self.current_pose[0], self.current_pose[1], self.current_pose[2]]
+
+        next_node_id = self.find_nearest_node('forward', pose)
+        prev_node_id = self.find_nearest_node('backward', pose)
+
+        for edge in self.vm_map.graph:
+            if edge[0]==prev_node_id and edge[1]==next_node_id:
+                edge[3] = 0
+
+        self.g.reset_map()
+        self.create_map(self.vm_map)
+        pass
+
+
