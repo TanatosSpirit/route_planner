@@ -19,7 +19,7 @@ rp.settings(40, 5) # км/ч
 vml = VMLoader()
 
 # загрузили карта из файла и получили структуру с файлом (создали топик с картой)
-filepath = 'data\\MiniPolygonGraph.namivm'
+filepath = r'data/MiniPolygonGraph.namivm'
 vm_map = vml.read_file(filepath)
 
 viz.new_fig()

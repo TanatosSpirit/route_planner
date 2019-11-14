@@ -72,7 +72,7 @@ class VMLoader:
 
 
 if __name__ == '__main__':
-    file_path = '..\\data\\MiniPolygonGraph.namivm'
+    file_path = r'../data/MiniPolygonGraph.namivm'
     vml = VMLoader()
     data = vml.read_file(file_path)
     print(data)
