@@ -1,7 +1,6 @@
 import rospy
 from route_planner.msg import WaypointOM
-# from vmloader import VMLoader
-import route_planner.libs
+from libs import VMLoader
 
 class VMLoaderCore:
     def __init__(self):
