@@ -1,24 +1,30 @@
 import rospy
-from route_planner.msg._WaypointOM import WaypointOM
+from route_planner.msg._Waypoint import Waypoint
 from libs import VMLoader
+from libs.struct_helper import VmMap
+import copy
 
 class VMLoaderCore:
     def __init__(self):
         rospy.init_node('vm_loader')
 
-        self.pub_1 = rospy.Publisher('/vm_map', WaypointOM, queue_size=1)
+        self.pub_1 = rospy.Publisher('/vm_map', Waypoint, queue_size=1)
 
         self.path = rospy.get_param('map_path', '')
 
+        self.direct_velocity = rospy.get_param('direct_velocity', 0)
+        self.reverse_velocity = rospy.get_param('reverse_velocity', 0)
+
         self.rate = rospy.Rate(10)
 
-
+        self.vm_map = VmMap()
+        self.vml = VMLoader()
 
     def run(self):
-        vml = VMLoader()
-        vm_map = vml.read_file(self.path)
+        self.vm_map = copy.deepcopy(self.vml.read_file(self.path))
+
         while not rospy.is_shutdown():
-            wp = WaypointOM()
+            wp = Waypoint()
 
             wp.x = 1
             wp.y = 2
