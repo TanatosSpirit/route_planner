@@ -1,6 +1,6 @@
 # coding=cp1251
 
-from route_planner import route_planner
+from libs.route_planner import route_planner
 from test_map import test_map
 from vmloader import VMLoader
 from visualizer import Visualizer
