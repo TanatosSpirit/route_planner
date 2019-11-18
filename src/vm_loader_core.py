@@ -1,5 +1,7 @@
 import rospy
 from route_planner.msg import WaypointOM
+# from vmloader import VMLoader
+import route_planner.libs
 
 class VMLoaderCore:
     def __init__(self):
@@ -14,6 +16,8 @@ class VMLoaderCore:
 
 
     def run(self):
+        vml = VMLoader()
+        vml.read_file(self.path)
         while not rospy.is_shutdown():
             wp = WaypointOM()
 
