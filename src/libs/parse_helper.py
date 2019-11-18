@@ -1,5 +1,5 @@
-from lane import Lane
-from node import Node
+from libs.map_objects.lane import Lane
+from libs.map_objects.node import Node
 from math_helper import add_direction
 
 def get_obj(file_object):
