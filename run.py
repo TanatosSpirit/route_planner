@@ -2,7 +2,7 @@
 
 from libs.route_planner import route_planner
 from test_map import test_map
-from vmloader import VMLoader
+from src.libs.vmloader import VMLoader
 from visualizer import Visualizer
 
 test = False

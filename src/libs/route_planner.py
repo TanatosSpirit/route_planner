@@ -1,8 +1,7 @@
 # coding=cp1251
 
 # в настроках проекта в PyCharm юзал папку lib/bellman-ford как source
-# from bellman_ford import Graph
-from bellman_ford_extended import Graph
+from libs.bellman_ford.bellman_ford_extended import Graph
 from struct_helper import RelativeInfo, VmMap
 import copy
 import numpy as np
