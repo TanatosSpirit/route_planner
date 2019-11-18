@@ -1,0 +1,9 @@
+<launch>
+  <!-- The look away node -->
+  <node name="vm_loader" type="vm_loader_node.py" pkg="route_planner" output="screen"/>
+    <rosparam>
+        map_path: '/home/tanat/ros_ws/src/route_planner/data/MiniPolygonGraph.namivm'
+    </rosparam>
+
+
+</launch>

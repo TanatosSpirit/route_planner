@@ -1,42 +1,50 @@
+# coding=cp1251
+
 from libs.route_planner import route_planner
 from test_map import test_map
-from libs.vmloader import VMLoader
-from libs.viz.visualizer import Visualizer
+from src.libs.vmloader import VMLoader
+from visualizer import Visualizer
 
 test = False
 
 viz = Visualizer()
 
-# СЃРѕР·РґР°РµРј РїР»Р°РЅРёСЂРѕРІС‰РёРє (Р·Р°РїСѓСЃС‚РёР»Рё ROS-РЅРѕРґСѓ)
+# создаем планировщик (запустили ROS-ноду)
 rp = route_planner()
 
-# СЃРѕР·РґР°РµРј Р·Р°РіСЂСѓР·С‡РёРє РєР°СЂС‚С‹ (Р·Р°РїСѓСЃС‚РёР»Рё ROS-РЅРѕРґСѓ)
+# настраиваем параметы (запустили config)
+rp.settings(40, 5) # км/ч
+
+# создаем загрузчик карты (запустили ROS-ноду)
 vml = VMLoader()
 
-# Р·Р°РіСЂСѓР·РёР»Рё РєР°СЂС‚Р° РёР· С„Р°Р№Р»Р° Рё РїРѕР»СѓС‡РёР»Рё СЃС‚СЂСѓРєС‚СѓСЂСѓ СЃ С„Р°Р№Р»РѕРј (СЃРѕР·РґР°Р»Рё С‚РѕРїРёРє СЃ РєР°СЂС‚РѕР№)
-filepath = 'data\\MiniPolygonGraph.namivm'
+# загрузили карта из файла и получили структуру с файлом (создали топик с картой)
+filepath = r'data/MiniPolygonGraph.namivm'
 vm_map = vml.read_file(filepath)
 
 viz.new_fig()
 viz.take_map(vm_map)
 
-# РїРµСЂРµРґР°Р»Рё РєР°СЂС‚Сѓ РїР»Р°РЅРёСЂРѕРІС‰РёРєСѓ (РїСЂРѕСЃР»СѓС€Р°Р»Рё С‚РѕРїРёРє СЃ РІРµРєС‚РѕСЂРЅРѕР№ РєР°СЂС‚РѕР№)
+# передали карту планировщику (прослушали топик с векторной картой)
 if test == True:
     rp.load_map(test_map)
 else:
     rp.load_map(vm_map)
 
-vehicle_pose = 3  # РЅРѕРјРµСЂ СѓР·Р»Р°
-# СѓСЃС‚Р°РЅРѕРІРёР»Рё С‚РµРєСѓС‰РµРµ РїРѕР»РѕР¶РµРЅРёРµ РўРЎ (РїСЂРѕСЃР»СѓС€Р°Р»Рё С‚РѕРїРёРє СЃ РїРѕР»РѕР¶РµРЅРёРµРј РјР°С€РёРЅС‹)
+vehicle_pose = [-26., -11., 42., 0]  # вектор положения в пространстве (x, y, z, азимут)
+# установили текущее положение ТС (прослушали топик с положением машины)
 rp.set_current_pose(vehicle_pose)
+viz.take_vehicle_pose(vehicle_pose)
 
-destination_pose = 1  # РЅРѕРјРµСЂ СѓР·Р»Р°
-# СѓРєР°Р·Р°Р»Рё РєСѓРґР° РЅСѓР¶РЅРѕ РїСЂРёРµС…Р°С‚СЊ
+destination_pose = [16., 25., 0, 0]  # вектор положения в пространстве (x, y, z, азимут)
+# указали куда нужно приехать
 rp.set_destination_point(destination_pose)
 
-# РџРѕР»СѓС‡Р°РµРј РІС‹РІРѕРґ Рѕ РґРѕСЃС‚СѓРїРЅРѕСЃС‚Рё С‚РѕС‡РєРё РЅР°Р·РЅР°С‡РµРЅРёСЏ Рё РјР°СЂС€СЂСѓС‚(С‚СЂР°РµРєС‚РѕСЂРёСЋ) РґРѕ РЅРµРµ
-route = rp.get_path() # TODO СЌС‚Рѕ РЅР°Р±РѕСЂ РїСѓС‚РµРІС‹С… С‚РѕС‡РµРє, С‡С‚Рѕ СЌС‚Рѕ? РўСЂР°РµРєС‚РѕСЂРёСЏ?
-print(route)
+rp.disconnect_node()
+
+# Получаем вывод о доступности точки назначения и маршрут(траекторию) до нее
+route = rp.get_path() # TODO это набор путевых точек, что это? Траектория?
+print(route[0], ": ", route[1])
 viz.take_route(route)
 
 viz.show()
