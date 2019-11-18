@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-from route_planner.msg import WaypointOM
 from vm_loader_core import VMLoaderCore
 
 
