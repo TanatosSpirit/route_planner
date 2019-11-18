@@ -1,5 +1,0 @@
-<launch>
-  <!-- The look away node -->
-  <node name="route_planner_node" type="route_planner_node" pkg="route_planner" output="screen"/>
-
-</launch>

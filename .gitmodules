@@ -1,3 +1,6 @@
 [submodule "libs/bellman-ford"]
 	path = libs/bellman-ford
 	url = https://github.com/TanatosSpirit/bellman-ford
+[submodule "src/bellman_ford"]
+	path = src/bellman_ford
+	url = https://github.com/TanatosSpirit/bellman-ford
