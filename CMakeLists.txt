@@ -51,6 +51,9 @@ catkin_python_setup()
 add_message_files(
    FILES
    Waypoint.msg
+   Point3D.msg
+   Node.msg
+   VmMap.msg
 )
 
 ## Generate services in the 'srv' folder

@@ -1,8 +1,8 @@
 import rospy
 from route_planner.msg._Waypoint import Waypoint
+from route_planner.msg._Point3D import Point3D
 from libs import VMLoader
 from libs.struct_helper import VmMap
-import copy
 
 class VMLoaderCore:
     def __init__(self):
@@ -21,7 +21,7 @@ class VMLoaderCore:
         self.vml = VMLoader()
 
     def run(self):
-        self.vm_map = copy.deepcopy(self.vml.read_file(self.path))
+        self.vm_map = self.vml.read_file(self.path)
 
         while not rospy.is_shutdown():
             wp = Waypoint()
@@ -34,3 +34,6 @@ class VMLoaderCore:
             self.pub_1.publish(wp)
 
             self.rate.sleep()
+
+    def convert_map(self):
+
