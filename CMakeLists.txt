@@ -55,6 +55,9 @@ add_message_files(
    Node.msg
    VectorMap.msg
    MapObject.msg
+   Edge.msg
+   Identification.msg
+   Lane.msg
 )
 
 ## Generate services in the 'srv' folder
