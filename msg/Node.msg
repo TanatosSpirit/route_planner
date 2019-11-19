@@ -1,3 +1,4 @@
+MapObject obj_header
 Point3D pose
-uint16 input
-uint16 output
+uint32[] input
+uint32[] output

@@ -53,7 +53,8 @@ add_message_files(
    Waypoint.msg
    Point3D.msg
    Node.msg
-   VmMap.msg
+   VectorMap.msg
+   MapObject.msg
 )
 
 ## Generate services in the 'srv' folder
