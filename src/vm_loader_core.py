@@ -14,7 +14,7 @@ class VMLoaderCore:
     def __init__(self):
         rospy.init_node('vm_loader')
 
-        self.pub_1 = rospy.Publisher('/vm_map', VectorMap, queue_size=1)
+        self.pub_1 = rospy.Publisher('/vm_map', VectorMap, latch=False, queue_size=1)
 
         self.path = rospy.get_param('map_path', '')
 
