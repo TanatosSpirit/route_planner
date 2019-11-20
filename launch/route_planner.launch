@@ -1,0 +1,4 @@
+<launch>
+    <!-- The look away node -->
+    <node name="route_planner" type="route_planner_node.py" pkg="route_planner" output="screen"/>
+</launch>
