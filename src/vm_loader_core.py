@@ -18,9 +18,6 @@ class VMLoaderCore:
 
         self.path = rospy.get_param('map_path', '')
 
-        self.direct_velocity = rospy.get_param('direct_velocity', 0)
-        self.reverse_velocity = rospy.get_param('reverse_velocity', 0)
-
         self.vm_map = VmMap()
         self.vml = VMLoader()
         self.map_loaded = False

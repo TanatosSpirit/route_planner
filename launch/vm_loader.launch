@@ -3,8 +3,6 @@
   <node name="vm_loader" type="vm_loader_node.py" pkg="route_planner" output="screen"/>
     <rosparam>
         map_path: '/home/tanat/ros_ws/src/route_planner/data/MiniPolygonGraph.namivm'
-        direct_velocity: 40
-        reverse_velocity: 5
     </rosparam>
 
 
