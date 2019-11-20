@@ -14,14 +14,12 @@ class VMLoaderCore:
     def __init__(self):
         rospy.init_node('vm_loader')
 
-        self.pub_1 = rospy.Publisher('/vm_map', VectorMap, latch=False, queue_size=1)
+        self.pub_1 = rospy.Publisher('/vm_map', VectorMap, latch=True, queue_size=1)
 
         self.path = rospy.get_param('map_path', '')
 
         self.direct_velocity = rospy.get_param('direct_velocity', 0)
         self.reverse_velocity = rospy.get_param('reverse_velocity', 0)
-
-        self.rate = rospy.Rate(10)
 
         self.vm_map = VmMap()
         self.vml = VMLoader()
@@ -32,15 +30,13 @@ class VMLoaderCore:
     def run(self):
         self.vm_map = self.vml.read_file(self.path)
 
-        while not rospy.is_shutdown():
+        if not self.map_loaded:
+            self.convert_map()
+            self.map_loaded = True
 
-            if not self.map_loaded:
-                self.convert_map()
-                self.map_loaded = True
+        self.pub_1.publish(self.vector_map)
 
-            self.pub_1.publish(self.vector_map)
-
-            self.rate.sleep()
+        rospy.spin()
 
     def convert_map(self):
 
