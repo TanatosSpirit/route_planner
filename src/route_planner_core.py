@@ -53,9 +53,12 @@ class RoutePlannerCore:
 
         :type data: Waypoint
         """
-        self.destination = copy.deepcopy(data)
-        self.rp.set_destination_point(self.get_list_from_wp(self.destination))
-        self.generate_path()
+        is_change_dest_wp = self.compare_wps(self.destination, data)
+
+        if is_change_dest_wp:
+            self.destination = copy.deepcopy(data)
+            self.rp.set_destination_point(self.get_list_from_wp(self.destination))
+            self.generate_path()
 
     def current_pose_callback(self, data):
         """
@@ -119,3 +122,16 @@ class RoutePlannerCore:
             self.vm.nodes.append(node_obj)
 
         self.vm.num_of_nodes = len(self.vm.nodes)
+
+    def compare_wps(self, destination, data):
+        is_change = False
+
+        if destination.x != data.x or \
+            destination.y != data.y or \
+            destination.z != data.z or \
+            destination.direction != data.direction:
+
+            is_change = True
+
+        return is_change
+
