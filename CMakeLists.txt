@@ -58,6 +58,7 @@ add_message_files(
    Edge.msg
    Identification.msg
    Lane.msg
+   Track.msg
 )
 
 ## Generate services in the 'srv' folder
