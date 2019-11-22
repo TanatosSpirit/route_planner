@@ -8,6 +8,7 @@ from libs.map_objects.lane import Lane
 from libs.map_objects.node import Node
 import copy
 
+
 class RoutePlannerCore:
     def __init__(self):
         rospy.init_node('route_planner')
@@ -127,11 +128,9 @@ class RoutePlannerCore:
         is_change = False
 
         if destination.x != data.x or \
-            destination.y != data.y or \
-            destination.z != data.z or \
-            destination.direction != data.direction:
-
+                destination.y != data.y or \
+                destination.z != data.z or \
+                destination.direction != data.direction:
             is_change = True
 
         return is_change
-
