@@ -1,14 +1,9 @@
 import rospy
-from route_planner.msg._Waypoint import Waypoint
-from route_planner.msg._Point3D import Point3D
+from route_planner.msg import *
 from libs import VMLoader
 from libs.struct_helper import VmMap
-from route_planner.msg._Node import Node
-from route_planner.msg._VectorMap import VectorMap
-from route_planner.msg._MapObject import MapObject
-from route_planner.msg._Edge import Edge
-from route_planner.msg._Lane import Lane
 import copy
+
 
 class VMLoaderCore:
     def __init__(self):

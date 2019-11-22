@@ -1,7 +1,5 @@
 import rospy
-from route_planner.msg._VectorMap import VectorMap
-from route_planner.msg._Waypoint import Waypoint
-from route_planner.msg._Track import Track
+from route_planner.msg import *
 from libs.route_planner import route_planner
 from libs.struct_helper import VmMap
 from libs.map_objects.lane import Lane
