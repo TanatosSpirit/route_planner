@@ -3,6 +3,9 @@ from route_planner.msg._VectorMap import VectorMap
 from route_planner.msg._Waypoint import Waypoint
 from libs.route_planner import route_planner
 from std_msgs.msg import Bool
+from libs.struct_helper import VmMap
+from libs.map_objects.lane import Lane
+from libs.map_objects.node import Node
 import copy
 
 class RoutePlannerCore:
@@ -16,19 +19,23 @@ class RoutePlannerCore:
         self.sub_2 = rospy.Subscriber('/current_pose', Waypoint, self.current_pose_callback)
 
         self.rp = route_planner()
-        self.vm = VectorMap()
+        self.vm = VmMap()
         self.destination = Waypoint()
         self.current_pose = Waypoint()
+        self.route = []
 
         self.direct_velocity = rospy.get_param('direct_velocity', 0)
         self.reverse_velocity = rospy.get_param('reverse_velocity', 0)
 
-        self.rp.settings(self.direct_velocity, self.reverse_velocity)
+        self.setup_route_planner()
 
         # self.path = rospy.get_param('map_path', '')
         #
         # self.direct_velocity = rospy.get_param('direct_velocity', 0)
         # self.reverse_velocity = rospy.get_param('reverse_velocity', 0)
+
+    def setup_route_planner(self):
+        self.rp.settings(self.direct_velocity, self.reverse_velocity)
 
     def run(self):
         rospy.spin()
@@ -38,8 +45,8 @@ class RoutePlannerCore:
 
         :type data: VectorMap
         """
-        self.vm = copy.deepcopy(data)
-        self.pub_1.publish(True)
+        self.msg2map(data)
+        self.rp.load_map(self.vm)
 
     def destination_callback(self, data):
         """
@@ -47,10 +54,68 @@ class RoutePlannerCore:
         :type data: Waypoint
         """
         self.destination = copy.deepcopy(data)
+        self.rp.set_destination_point(self.get_list_from_wp(self.destination))
+        self.generate_path()
 
     def current_pose_callback(self, data):
         """
 
         :type data: Waypoint
         """
-        self.rp.set_current_pose(data)
+        self.current_pose = copy.deepcopy(data)
+        self.rp.set_current_pose(self.get_list_from_wp(self.current_pose))
+
+    def get_list_from_wp(self, wp):
+        """
+
+        :type wp: Waypoint
+        """
+        return [wp.x, wp.y, wp.z, wp.direction]
+
+    def generate_path(self):
+        self.route = self.rp.get_path()
+
+    def msg2map(self, data):
+        """
+
+        :type data: VectorMap
+        """
+        for lane in data.lanes:
+            lane_obj = Lane()
+
+            lane_obj.name = lane.obj_header.Name
+            lane_obj.vm_id = lane.obj_header.vm_id
+            lane_obj.obj_id = lane.obj_header.obj_id
+            lane_obj.length = lane.length
+            lane_obj.identification[0] = lane.identification.source
+            lane_obj.identification[1] = lane.identification.destination
+
+            for wp in lane.wps:
+                x = wp.x
+                y = wp.y
+                z = wp.z
+                alfa = wp.direction
+                lane_obj.wp_array.append([x, y, z, alfa])
+
+            self.vm.lanes.append(lane_obj)
+
+        for edge in data.graph:
+            u = edge.u
+            v = edge.v
+            w = edge.length
+            a = edge.available
+            self.vm.graph.append([u, v, w, a])
+
+        for node in data.nodes:
+            node_obj = Node()
+
+            node_obj.name = node.obj_header.Name
+            node_obj.vm_id = node.obj_header.vm_id
+            node_obj.obj_id = node.obj_header.obj_id
+            node_obj.xyz = node.pose
+            node_obj.in_lane_id_array = node.input
+            node_obj.out_lane_id_array = node.output
+
+            self.vm.nodes.append(node_obj)
+
+        self.vm.num_of_nodes = len(self.vm.nodes)
