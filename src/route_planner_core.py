@@ -28,6 +28,10 @@ class RoutePlannerCore:
 
         self.setup_route_planner()
 
+        self.is_set_current_pose = False
+        self.is_set_destination_pose = False
+        self.is_map_loaded = False
+
     def setup_route_planner(self):
         self.rp.settings(self.direct_velocity, self.reverse_velocity)
 
@@ -42,6 +46,11 @@ class RoutePlannerCore:
         self.msg2map(data)
         self.rp.load_map(self.vm)
 
+        self.is_map_loaded = True
+
+        if self.is_set_current_pose and self.is_set_destination_pose:
+            self.generate_path()
+
     def destination_callback(self, data):
         """
 
@@ -52,9 +61,11 @@ class RoutePlannerCore:
         if is_change_dest_wp:
             self.destination = copy.deepcopy(data)
             self.rp.set_destination_point(self.get_list_from_wp(self.destination))
-            self.generate_path()
 
-            self.publish_track()
+            self.is_set_destination_pose = True
+
+            if self.is_set_current_pose and self.is_map_loaded:
+                self.generate_path()
 
     def current_pose_callback(self, data):
         """
@@ -63,6 +74,11 @@ class RoutePlannerCore:
         """
         self.current_pose = copy.deepcopy(data)
         self.rp.set_current_pose(self.get_list_from_wp(self.current_pose))
+
+        self.is_set_current_pose = True
+
+        if self.is_set_destination_pose and self.is_map_loaded:
+            self.generate_path()
 
     def get_list_from_wp(self, wp):
         """
@@ -73,6 +89,7 @@ class RoutePlannerCore:
 
     def generate_path(self):
         self.route = self.rp.get_path()
+        self.publish_track()
 
     def msg2map(self, data):
         """
