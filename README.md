@@ -1,7 +1,9 @@
 Route-planner
 
-Карта для тестирования поиска маршрута
-===
+Пакет реализован на Python и состоит из двух нод:
+1) route_planner_node
+2) vm_loader_node
+                                                                                         
 в Ubuntu. Для настройки добавить venv от системного python 2.7
 
 
