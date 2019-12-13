@@ -80,7 +80,7 @@ class RoutePlannerCore:
         if self.is_set_destination_pose and self.is_map_loaded:
             self.generate_path()
 
-    def get_list_from_wp(self, wp):
+    def get_list_from_wp(self, wp): # TODO can be helper function
         """
 
         :type wp: Waypoint

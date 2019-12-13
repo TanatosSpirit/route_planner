@@ -6,7 +6,7 @@ from struct_helper import RelativeInfo, VmMap
 import copy
 import numpy as np
 
-class route_planner:
+class route_planner:  # TODO rename class
 
     def __init__(self):
         self.vm_map = VmMap()
