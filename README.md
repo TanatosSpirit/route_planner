@@ -6,6 +6,7 @@ ROS обвязка:
 Обеспечивает обмен данными с классом планирощика route_planner().
 
 **Instance Variables**
+
 *   pub_1 (name='/track', data_class=Track)
 *   sub_1 (name='/vm_map', data_class=VectorMap)
 *   sub_2 (name='/destination', data_class=Waypoint)
@@ -22,10 +23,13 @@ ROS обвязка:
 *   is_map_loaded (bool)
 
 **Methods**
+
 *   setup_route_planner (self)
     * Устанавливает скорости движения задним и передним ходом, которые учитываются при расчете времени в пути.
+    
 *   run (self)
     * Не позволяет ROS ноде самостоятельно завершить работ 
+    
 *   vector_map_callback (self, data)
     * Конвертирует ros сообщение с картой в формат обрабатываемый планировщиком и передает карту планировщику. Если 
     известны текущее местоположение и точка назначения, то вызывает self.generate_path().
