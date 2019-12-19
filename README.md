@@ -1,7 +1,64 @@
 Route-planner
 
-Карта для тестирования поиска маршрута
-===
+ROS обвязка:
+## RoutePlannerCore class
+
+Обеспечивает обмен данными с классом планирощика route_planner().
+
+**Instance Variables**
+
+*   pub_1 (name='/track', data_class=Track)
+*   sub_1 (name='/vm_map', data_class=VectorMap)
+*   sub_2 (name='/destination', data_class=Waypoint)
+*   sub_2 (name='/current_pose', data_class=Waypoint)
+*   rp (route_planner())
+*   vm (VmMap())
+*   destination (Waypoint())
+*   current_pose (Waypoint())
+*   route ([])
+*   direct_velocity (float)
+*   reverse_velocity (float)
+*   is_set_current_pose (bool)
+*   is_set_destination_pose (bool)
+*   is_map_loaded (bool)
+
+**Methods**
+
+*   setup_route_planner (self)
+    * Устанавливает скорости движения задним и передним ходом, которые учитываются при расчете времени в пути.
+    
+*   run (self)
+    * Не позволяет ROS ноде самостоятельно завершить работ 
+    
+*   vector_map_callback (self, data)
+    * Конвертирует ros сообщение с картой в формат обрабатываемый планировщиком и передает карту планировщику. Если 
+    известны текущее местоположение и точка назначения, то вызывает self.generate_path().
+    * **Parameters**:
+        * data (route_planner/VectorMap.msg)
+        
+*   destination_callback (self, data)
+    * Сравнивает текущую точку назначения с пришедшей. Если точка назначения изменилась, то записывает ее в планировщик.
+    Если известна текущее положение и векторная карта загружена, то вызывает self.generate_path().
+    * **Parameters**:
+        * data (route_planner/Waypoint.msg)
+        
+*   current_pose_callback (self, data)
+*   get_list_from_wp (self, wp)
+*   generate_path (self)
+*   msg2map (self, data)
+*   compare_wps (self, destination, data)
+*   publish_track (self)
+
+Пакет реализован на Python и состоит из двух нод:
+1) route_planner_node
+2) vm_loader_node
+
+Каждая из нод создает объекты своих почти одноименных классов RoutePlannerCore() и VMLoaderCore(), а затем выполняет
+метод run(). Данные классы являются целиком и полностью ROS'овскими и нужны для применения объектов классов VMLoader()
+и route_planner(), которые реализуют алгоритмы, а также конвертирования данных ROS-msgs и типов используемых в 
+VMLoader() и route_planner().
+
+                                                                                       
 в Ubuntu. Для настройки добавить venv от системного python 2.7
 
 
@@ -70,3 +127,5 @@ Route-planner
 
 - В Autoware сохраняется номер предыдущей путевой точки, чтобы быстрее найти следующую. 
 Хотя на холодную так не получится. В общем в динамике можно сделать иначе
+- Обязательно для ноды нужно сделать chmod u+x
+- всегда будет приниматься точка назначения и если она изменилась, перестраивать положение.
