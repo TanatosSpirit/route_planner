@@ -10,6 +10,7 @@ project(route_planner)
 find_package(catkin REQUIRED COMPONENTS
 	std_msgs
 	message_generation
+	geometry_msgs
 )
 
 set(CMAKE_CXX_FLAGS "-O2 -Wall ${CMAKE_CXX_FLAGS}")
@@ -78,6 +79,7 @@ add_message_files(
 generate_messages(
    DEPENDENCIES
    std_msgs  # Or other packages containing msgs
+   geometry_msgs
 )
 
 ################################################

@@ -1,4 +1,3 @@
-float32 x
-float32 y
-float32 z
-float32 direction
+geometry_msgs/Point pose
+geometry_msgs/Quaternion orientation
+bool current

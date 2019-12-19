@@ -1,1 +1,2 @@
-Waypoint[] wps
+Header header
+Waypoint[] waypoints
