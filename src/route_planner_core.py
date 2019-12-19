@@ -4,6 +4,7 @@ from libs.route_planner import route_planner
 from libs.struct_helper import VmMap
 from libs.map_objects.lane import Lane
 from libs.map_objects.node import Node
+from libs.math_helper import euler_to_quaternion, quaternion_to_euler
 import copy
 
 
@@ -85,7 +86,8 @@ class RoutePlannerCore:
 
         :type wp: Waypoint
         """
-        return [wp.x, wp.y, wp.z, wp.direction]
+        angles = quaternion_to_euler(wp.orientation)
+        return [wp.pose.x, wp.pose.y, wp.pose.z, angles[0]]
 
     def generate_path(self):
         self.route = self.rp.get_path()
@@ -107,10 +109,11 @@ class RoutePlannerCore:
             lane_obj.identification[1] = lane.identification.destination
 
             for wp in lane.wps:
-                x = wp.x
-                y = wp.y
-                z = wp.z
-                alfa = wp.direction
+                x = wp.pose.x
+                y = wp.pose.y
+                z = wp.pose.z
+                angles = quaternion_to_euler(wp.orientation)
+                alfa = angles[0]
                 lane_obj.wp_array.append([x, y, z, alfa])
 
             self.vm.lanes.append(lane_obj)
@@ -139,10 +142,13 @@ class RoutePlannerCore:
     def compare_wps(self, destination, data):
         is_change = False
 
-        if destination.x != data.x or \
-                destination.y != data.y or \
-                destination.z != data.z or \
-                destination.direction != data.direction:
+        if destination.pose.x != data.pose.x or \
+                destination.pose.y != data.pose.y or \
+                destination.pose.z != data.pose.z or \
+                destination.orientation.x != data.orientation.x or\
+                destination.orientation.y != data.orientation.y or\
+                destination.orientation.z != data.orientation.z or\
+                destination.orientation.w != data.orientation.w:
             is_change = True
 
         return is_change
@@ -152,11 +158,17 @@ class RoutePlannerCore:
         track_obj = Track()
         for wp in self.route[2]:  ## TODO REDO
             wp_obj = Waypoint()
-            wp_obj.x = wp[0]
-            wp_obj.y = wp[1]
-            wp_obj.z = wp[2]
-            wp_obj.direction = wp[3]
+            wp_obj.pose.x = wp[0]
+            wp_obj.pose.y = wp[1]
+            wp_obj.pose.z = wp[2]
+            quat = euler_to_quaternion(0, 0, wp[3])
+            wp_obj.orientation.x = quat[0]
+            wp_obj.orientation.y = quat[1]
+            wp_obj.orientation.z = quat[2]
+            wp_obj.orientation.w = quat[3]
+            wp_obj.current = False
 
-            track_obj.wps.append(wp_obj)
+
+            track_obj.waypoints.append(wp_obj)
 
         self.pub_1.publish(track_obj)
