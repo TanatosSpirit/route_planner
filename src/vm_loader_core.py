@@ -1,4 +1,5 @@
 import rospy
+from libs.math_helper import euler_to_quaternion
 from route_planner.msg import *
 from libs import VMLoader
 from libs.struct_helper import VmMap
@@ -72,10 +73,15 @@ class VMLoaderCore:
             lane_obj.speed = lane.speed
             for wp in lane.wp_array:
                 wp_obg = Waypoint()
-                wp_obg.x = wp[0]
-                wp_obg.y = wp[1]
-                wp_obg.z = wp[2]
-                wp_obg.direction = wp[3]
+                wp_obg.pose.x = wp[0]
+                wp_obg.pose.y = wp[1]
+                wp_obg.pose.z = wp[2]
+                quat = euler_to_quaternion(0, 0, wp[3])
+                wp_obg.orientation.x = quat[0]
+                wp_obg.orientation.y = quat[1]
+                wp_obg.orientation.z = quat[2]
+                wp_obg.orientation.w = quat[3]
+                wp_obg.current = False
 
                 lane_obj.wps.append(wp_obg)
 
